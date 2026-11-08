@@ -126,11 +126,45 @@ details.rules ul{margin:10px 0 0;padding-left:18px;display:flex;flex-direction:c
 .banner .headline{font-size:26px}
 footer{padding-bottom:24px}
 @media (prefers-reduced-motion: reduce){.card{transition:none}.card:hover,.card.on{transform:none}}
+
+/* Round replay */
+.arena{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(5px);
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.arena-in{width:100%;max-width:760px;display:flex;flex-direction:column;gap:14px}
+.arena-top{display:flex;justify-content:space-between;align-items:center}
+.abanner{min-height:40px;text-align:center;font-family:var(--display);font-size:clamp(20px,5.5vw,32px);line-height:1.1;color:var(--accent);text-wrap:balance}
+.abanner.kinst{color:var(--inst)} .abanner.ktrap{color:var(--trap)}
+.lanes{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px;align-items:start}
+.lane{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.lane-name{position:relative;font-weight:700;font-size:13px;text-align:center;overflow-wrap:anywhere}
+.slot{position:relative;width:100%;max-width:132px;aspect-ratio:5/7;perspective:700px}
+.acard{position:absolute;inset:0;border-radius:12px;border:3px solid var(--cc,var(--line));background:color-mix(in srgb,var(--cc,var(--line)) 15%,var(--surface));
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 6px;box-shadow:0 6px 16px color-mix(in srgb,var(--ink) 16%,transparent)}
+.acard.tR{--cc:var(--R)} .acard.tP{--cc:var(--P)} .acard.tS{--cc:var(--S)}
+.acard.back{--cc:var(--accent);background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--accent) 24%,var(--surface)) 0 8px,var(--surface) 8px 16px)}
+.acard.none{border-style:dashed;box-shadow:none;color:var(--muted);font-size:12px;justify-content:center;text-align:center}
+.av{font-family:var(--display);font-size:clamp(24px,7vw,40px);line-height:1;color:var(--cc);display:inline-block;font-variant-numeric:tabular-nums}
+.ai{font-size:clamp(24px,7vw,40px);line-height:1;display:inline-block}
+.an{font-size:11px;font-weight:700;color:var(--cc)}
+.acard.dim .ai{opacity:.25}
+.acard.awin{box-shadow:0 0 0 4px var(--good),0 10px 28px color-mix(in srgb,var(--good) 45%,transparent)}
+.acard.alose{filter:grayscale(.85);opacity:.55}
+.achips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;min-height:22px}
+.pill{background:var(--surface)}
+.pill.fizzle{opacity:.35;text-decoration:line-through}
+.pill.armed{background:var(--cc);color:var(--surface)}
+.afloat{position:absolute;left:50%;top:12%;z-index:3;pointer-events:none;white-space:nowrap;font-family:var(--display);font-size:24px;
+  text-shadow:0 2px 0 var(--surface),0 -2px 0 var(--surface),2px 0 0 var(--surface),-2px 0 0 var(--surface)}
+.afloat.up{color:var(--good)} .afloat.down{color:var(--S)} .afloat.neutral{color:var(--ink);font-size:17px} .afloat.trap{color:var(--trap);font-size:15px}
+.aghost{position:fixed;margin:0;z-index:60;pointer-events:none}
+.capwarn{border:2px solid var(--S);color:var(--S);border-radius:10px;padding:8px 12px;font-weight:700}
 </style>
 
 </head>
 <body>
 <div id="app"></div>
+<div id="arena" class="arena" hidden></div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
@@ -194,6 +228,10 @@ es:{
   targetLabel:'si ganas, afecta a',
   hBlocked:'Esa carta está bloqueada esta ronda.',hMax3:'Máximo 3 powerups por ronda.',hBlk1:'Máximo 1 carta de bloqueo.',
   hSendFail:'No se pudo enviar. Revisa la conexión.',
+  handCap:h=>`Tu mano · ${h}/8 cartas`,
+  capWarn:(h,n)=>`Tienes ${h} cartas y el máximo es 8. Toca ${n===1?'1 carta':n+' cartas'} para descartar antes de jugar.`,
+  animSkip:'Saltar',animWin:'¡Gana!',animTie:'Empate',animNoCard:'Sin carta',animCards:n=>`−${n} cartas`,
+  animTrap:'¡Trampa lista!',animDuel:'solo números',animInvCancel:'Invertido ×2: se cancela',trapWord:'Trampa',
   L:{
     start:()=>'Empieza la partida',shuffle:()=>'Se baraja la pila de descarte',
     noRPS:n=>`${n} no tenía cartas PPoT: descarta su mano y roba 7`,
@@ -262,6 +300,10 @@ en:{
   targetLabel:'if you win, it hits',
   hBlocked:'That card is blocked this round.',hMax3:'Max 3 power-ups per round.',hBlk1:'Max 1 block card.',
   hSendFail:'Couldn’t send. Check your connection.',
+  handCap:h=>`Your hand · ${h}/8 cards`,
+  capWarn:(h,n)=>`You have ${h} cards and the max is 8. Tap ${n===1?'1 card':n+' cards'} to discard before you play.`,
+  animSkip:'Skip',animWin:'Wins!',animTie:'Tie',animNoCard:'No card',animCards:n=>`−${n} cards`,
+  animTrap:'Trap set!',animDuel:'numbers only',animInvCancel:'Reversed ×2: cancels out',trapWord:'Trap',
   L:{
     start:()=>'The game starts',shuffle:()=>'The discard pile is shuffled',
     noRPS:n=>`${n} had no RPS cards: discards their hand and draws 7`,
@@ -357,22 +399,27 @@ function resolve(G,subs){
   const tf={};TR.forEach(c=>{if(POW[c].tf)tf[POW[c].tf[0]]=POW[c].tf[1]});
   const low=TR.includes('low');
   let cards=P.map(p=>p.pp?{code:p.pp,t:p.pp[0],v:+p.pp.slice(1)}:null);
+  const steps=[];
+  if(Object.keys(tf).length)steps.push({k:'tf',m:tf});
+  if(low)steps.push({k:'low'});
   // Swap: only the RPS cards move, power cards stay with their owner
   const swaps=P.reduce((a,p)=>a+p.pw.filter(c=>c==='swap').length,0);
   const act=cards.map((c,i)=>c?i:-1).filter(i=>i>=0);
   if(swaps&&act.length>=2){
     const k=multi?swaps%act.length:swaps%2;
-    if(k){const old=act.map(i=>cards[i]);act.forEach((seat,j)=>{cards[seat]=old[(j-k+act.length*8)%act.length]})}
+    if(k){const old=act.map(i=>cards[i]);const perm={};act.forEach((seat,j)=>{const src=(j-k+act.length*8)%act.length;cards[seat]=old[src];perm[seat]=act[src]});steps.push({k:'swap',p:perm})}
   }
   cards.forEach(c=>{if(c){c.f=tf[c.t]||c.t;c.fv=c.v}});
   P.forEach((p,i)=>{
     p.pw.forEach(c=>{
-      if(c==='plus'&&cards[i])cards[i].fv+=3;
-      if(c==='minus')cards.forEach((x,j)=>{if(x&&j!==i)x.fv-=3});
+      if(c==='plus'&&cards[i]){cards[i].fv+=3;steps.push({k:'mod',by:i,c,to:[i],d:3})}
+      if(c==='minus'){const to=[];cards.forEach((x,j)=>{if(x&&j!==i){x.fv-=3;to.push(j)}});if(to.length)steps.push({k:'mod',by:i,c,to,d:-3})}
     });
   });
   const duelo=P.some(p=>p.pw.includes('duelo'));
-  const inv=P.reduce((a,p)=>a+p.pw.filter(c=>c==='inv').length,0)%2===1;
+  const invN=P.reduce((a,p)=>a+p.pw.filter(c=>c==='inv').length,0),inv=invN%2===1;
+  if(duelo)steps.push({k:'rule',c:'duelo'});
+  if(invN)steps.push({k:'rule',c:'inv',on:inv?1:0});
   const better=(a,b)=>low?a.fv<b.fv:a.fv>b.fv;
   const beats=(a,b)=>{
     if(duelo||a.f===b.f)return better(a,b);
@@ -389,7 +436,8 @@ function resolve(G,subs){
     }
     if(cand.length===1)w=cand[0];
   }
-  const L={r:G.round,w,flags:{duelo:duelo?1:0,inv:inv?1:0,low:low?1:0,swap:swaps?1:0,tf:Object.keys(tf).map(k=>k+tf[k])},
+  steps.push({k:'cmp',w,b:counts});
+  const L={r:G.round,w,steps,flags:{duelo:duelo?1:0,inv:inv?1:0,low:low?1:0,swap:swaps?1:0,tf:Object.keys(tf).map(k=>k+tf[k])},
     items:G.seats.map((s,i)=>({pp:P[i].pp,held:cards[i]?cards[i].code:null,f:cards[i]?cards[i].f:null,v:cards[i]?cards[i].fv:null,pw:P[i].pw,b:counts[i]}))};
   // discard everything except the winner's point and the winner's traps
   G.seats.forEach((s,i)=>{
@@ -408,15 +456,16 @@ function resolve(G,subs){
       if(c==='disc'){
         const k=Math.min(3,tg.hand.length);
         for(let x=0;x<k;x++)G.disc.push(tg.hand.splice(rnd(tg.hand.length),1)[0]);
-        log(G,'disc',tg.name,k);
+        log(G,'disc',tg.name,k);steps.push({k:'disc',by:w,tgt:P[w].tg[c],n:k});
       }else{
         const ty=c[3];const k=tg.pts.findIndex(x=>x[0]===ty);
         if(k>=0){G.disc.push(tg.pts.splice(k,1)[0]);log(G,'rem',s.name,ty,tg.name)}
         else log(G,'remNone',tg.name,ty);
+        steps.push({k:'rem',by:w,tgt:P[w].tg[c],ty,ok:k>=0?1:0});
       }
     });
     const tr=P[w].pw.filter(c=>POW[c].k==='trap');
-    if(tr.length){G.traps={o:w,c:tr};log(G,'trap',tr)}
+    if(tr.length){G.traps={o:w,c:tr};log(G,'trap',tr);steps.push({k:'trapset',by:w,c:tr})}
   }
   G.seats.forEach((s,i)=>draw(G,s,w==null?2:i===w?1:(multi?2:3)));
   G.seats.forEach(s=>fixNoRPS(G,s));
@@ -537,6 +586,7 @@ function guestJoin(){
   });
 }
 function leave(){
+  closeArena();animInit=false;animKey='';
   if(peer){try{peer.destroy()}catch(e){}}
   peer=null;conns={};hostConn=null;mode='home';G=null;view=null;mySub=null;sel=freshSel();subs={};joinError='';render(true);
 }
@@ -652,7 +702,8 @@ function gameHTML(){
     const excess=hand.length-8,needDc=excess-sel.dc.length;
     const blk=blockedFor(view.tr,me);
     const anyPlayable=hand.some(c=>canPlay(view.tr,me,c));
-    handH=`<section class="panel"><div class="row" style="justify-content:space-between"><div class="label">${t('yourHand',hand.length)}</div>${blk?`<span class="small err">${t('blocked',T().typesLow[blk])}</span>`:''}</div>
+    handH=`<section class="panel"><div class="row" style="justify-content:space-between"><div class="label">${t('handCap',hand.length)}</div>${blk?`<span class="small err">${t('blocked',T().typesLow[blk])}</span>`:''}</div>
+      ${needDc>0?`<div class="capwarn" role="status">${t('capWarn',hand.length,needDc)}</div>`:''}
       <div class="hand">${hand.map((c,i)=>cardHTML(c,i,[sel.pp===i||sel.pw.includes(i)?'on':'',sel.dc.includes(i)?'dc':'',isRPS(c)&&!canPlay(view.tr,me,c)?'blocked':''].join(' '))).join('')}</div>
       ${targetsHTML(hand,me)}</section>`;
     let m,btn;
@@ -662,7 +713,7 @@ function gameHTML(){
       m=t('sent',cards,waiting.join(', '));
       btn=`<button class="btn" data-act="unsubmit">${t('change')}</button>`;
     }else if(needDc>0){
-      m=t('discardN',hand.length,needDc);btn=`<button class="btn primary" disabled>${t('readyBtn')}</button>`;
+      m=t('capWarn',hand.length,needDc);btn=`<button class="btn primary" disabled>${t('readyBtn')}</button>`;
     }else if(!anyPlayable){
       m=t('cantPlay');btn=`<button class="btn primary" data-act="submit">${t('accept')}</button>`;
     }else{
@@ -699,6 +750,128 @@ function render(force,code){
     app.innerHTML=header()+body+'<footer></footer>';
   }
   const r=document.getElementById('rules');if(r&&rulesOpen)r.open=true;
+  maybeAnimate();
+}
+
+
+/* ------------------------------------------------------------------ round replay (Super Auto Pets style) */
+let animKey='',animInit=false,arenaCtl=null;
+const arena=document.getElementById('arena');
+const U=360;
+function maybeAnimate(){
+  if(!view)return;
+  const L=view.last,key=L?view.gid+':'+L.r:'';
+  if(!animInit){animInit=true;animKey=key;return}
+  if(!L||key===animKey)return;
+  animKey=key;
+  if(!L.steps)return;
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  playRound(L,view.seats.map(s=>s.n),mySeat(),view.n);
+}
+function closeArena(){if(arenaCtl)arenaCtl.abort=true;arenaCtl=null;arena.hidden=true;arena.innerHTML=''}
+async function playRound(L,names,me,n){
+  closeArena();
+  const ctl={abort:false};arenaCtl=ctl;
+  const sp=ms=>new Promise(r=>setTimeout(r,ms));
+  const gone=()=>ctl.abort;
+  const items=L.items;
+  arena.innerHTML=`<div class="arena-in" role="dialog" aria-label="${esc(t('roundN',L.r))}">
+   <div class="arena-top"><span class="label">${esc(t('roundN',L.r))}</span><button class="btn sm" id="skip">${t('animSkip')}</button></div>
+   <div class="abanner" id="abanner"></div>
+   <div class="lanes" style="--n:${items.length}">${items.map((it,i)=>`<div class="lane">
+     <div class="lane-name">${esc(names[i])}${i===me?t('you'):''}</div>
+     <div class="slot">${it.pp?`<div class="acard back"><span class="av"></span><span class="ai"></span><span class="an"></span></div>`:`<div class="acard none">${t('animNoCard')}</div>`}</div>
+     <div class="achips">${it.pw.map(c=>`<span class="pill k${POW[c].k}" data-c="${c}" style="opacity:0">${esc(ptitle(c))}</span>`).join('')}</div>
+   </div>`).join('')}</div></div>`;
+  arena.hidden=false;
+  arena.querySelector('#skip').onclick=closeArena;
+  const A=(el,kf,o)=>{try{return el.animate(kf,typeof o==='number'?{duration:o,easing:'ease-out'}:o).finished.catch(()=>{})}catch(e){return Promise.resolve()}};
+  A(arena,[{opacity:0},{opacity:1}],160);
+  const lanes=[...arena.querySelectorAll('.lane')];
+  const slot=i=>lanes[i].querySelector('.slot');
+  const nameEl=i=>lanes[i].querySelector('.lane-name');
+  const chip=(i,c)=>lanes[i].querySelector(`.achips [data-c="${c}"]`);
+  const cs=items.map((it,i)=>it.pp?{pt:it.pp[0],t:it.pp[0],v:+it.pp.slice(1),el:slot(i).querySelector('.acard')}:null);
+  const paint=c=>{const e=c.el;e.className='acard t'+c.t+(c.dim?' dim':'')+(c.win?' awin':'')+(c.lose?' alose':'');e.querySelector('.av').textContent=c.v;e.querySelector('.ai').textContent=ICON[c.t];e.querySelector('.an').textContent=T().types[c.t]};
+  const flipTo=async(c,fn)=>{await A(c.el,[{transform:'rotateY(0)'},{transform:'rotateY(90deg)'}],110);fn();paint(c);await A(c.el,[{transform:'rotateY(-90deg)'},{transform:'rotateY(0)'}],110)};
+  const shake=el=>A(el,[{transform:'translateX(0)'},{transform:'translateX(-8px) rotate(-4deg)'},{transform:'translateX(8px) rotate(4deg)'},{transform:'translateX(-4px) rotate(-2deg)'},{transform:'translateX(0)'}],280);
+  const pop=el=>A(el,[{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:240,easing:'cubic-bezier(.3,1.6,.5,1)'});
+  const float=(host,text,cls)=>{const f=document.createElement('span');f.className='afloat '+(cls||'');f.textContent=text;host.appendChild(f);
+    A(f,[{transform:'translate(-50%,0) scale(.5)',opacity:0},{transform:'translate(-50%,-24px) scale(1.2)',opacity:1,offset:.25},{transform:'translate(-50%,-34px) scale(1)',opacity:1,offset:.7},{transform:'translate(-50%,-64px) scale(.9)',opacity:0}],1000).then(()=>f.remove())};
+  const banner=async(text,cls)=>{const b=arena.querySelector('#abanner');if(!b)return;b.className='abanner '+(cls||'');b.textContent=text;await A(b,[{transform:'scale(.3) rotate(-6deg)',opacity:0},{transform:'scale(1.15) rotate(2deg)',opacity:1,offset:.6},{transform:'scale(1)',opacity:1}],280)};
+  const fly=async(from,to)=>{const a=from.getBoundingClientRect(),b=to.getBoundingClientRect();const g=from.cloneNode(true);g.classList.add('aghost');g.style.left=a.left+'px';g.style.top=a.top+'px';g.style.opacity=1;arena.appendChild(g);
+    const dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);
+    await A(g,[{transform:'translate(0,0) scale(1)'},{transform:`translate(${dx/2}px,${dy/2-50}px) scale(1.35) rotate(-8deg)`},{transform:`translate(${dx}px,${dy}px) scale(.5)`,opacity:.3}],{duration:330,easing:'ease-in'});g.remove()};
+  const tick=async(c,d)=>{for(let s=0;s<Math.abs(d);s++){c.v+=Math.sign(d);paint(c);pop(c.el.querySelector('.av'));await sp(70)}};
+  const swapAnim=perm=>{
+    const old=cs.slice(),first=old.map(c=>c&&c.el.getBoundingClientRect());
+    for(const d in perm){const c=old[perm[d]];slot(+d).appendChild(c.el);cs[+d]=c}
+    for(const d in perm){const s=perm[d],el=old[s].el,a=first[s],b=el.getBoundingClientRect(),dx=a.left-b.left,dy=a.top-b.top;
+      A(el,[{transform:`translate(${dx}px,${dy}px)`},{transform:`translate(${dx/2}px,${dy/2-60}px) scale(1.15) rotate(10deg)`},{transform:'translate(0,0)'}],{duration:500,easing:'ease-in-out'})}
+  };
+
+  // reveal: cards flip one by one, then the power-ups pop in under each card
+  await sp(160);if(gone())return;
+  for(const c of cs){if(!c)continue;await flipTo(c,()=>{});if(gone())return}
+  for(const [i,it] of items.entries())for(const c of it.pw){const ch=chip(i,c);if(!ch)continue;ch.style.opacity=1;A(ch,[{transform:'translateY(16px) scale(.4)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:240,easing:'cubic-bezier(.3,1.6,.5,1)'});await sp(80);if(gone())return}
+  await sp(U);
+  for(const st of L.steps){
+    if(gone())return;
+    if(st.k==='tf'){
+      for(const from in st.m){
+        await banner(`${t('trapWord')}: ${ICON[from]} → ${ICON[st.m[from]]}`,'ktrap');
+        for(const c of cs)if(c&&c.pt===from){shake(c.el);await flipTo(c,()=>{c.t=st.m[from]})}
+        await sp(U*.7);if(gone())return;
+      }
+    }else if(st.k==='low'){await banner(T().flags.low,'ktrap');await sp(U)}
+    else if(st.k==='swap'){await banner(T().flags.swap,'kinst');swapAnim(st.p);await sp(U*1.6)}
+    else if(st.k==='mod'){
+      const src=chip(st.by,st.c);if(src)pop(src);
+      for(const j of st.to){
+        const c=cs[j];if(!c)continue;
+        if(src)await fly(src,c.el);if(gone())return;
+        if(st.d>0)pop(c.el);else shake(c.el);
+        float(slot(j),(st.d>0?'+':'−')+Math.abs(st.d),st.d>0?'up':'down');
+        await tick(c,st.d);
+      }
+      await sp(U*.5);
+    }else if(st.k==='rule'){
+      if(st.c==='duelo'){await banner(`${T().flags.duelo} · ${t('animDuel')}`,'kinst');cs.forEach(c=>{if(c){c.dim=true;paint(c);pop(c.el.querySelector('.av'))}})}
+      else{await banner(st.on?T().flags.inv:t('animInvCancel'),'kinst');if(st.on)cs.forEach(c=>{if(c)A(c.el.querySelector('.ai'),[{transform:'rotate(0)'},{transform:'rotate(540deg)'}],500)})}
+      await sp(U);
+    }else if(st.k==='cmp'){
+      const act=cs.filter(Boolean);
+      await Promise.all(act.map(c=>A(c.el,[{transform:'translateY(0) scale(1)'},{transform:'translateY(-22px) scale(1.08)'}],{duration:200,easing:'ease-out'})));
+      await Promise.all(act.map(c=>A(c.el,[{transform:'translateY(-22px) scale(1.08)'},{transform:'translateY(8px) scale(.95)'},{transform:'translateY(0) scale(1)'}],{duration:170,easing:'ease-in'})));
+      if(gone())return;
+      if(n>=3)cs.forEach((c,i)=>{if(c)float(slot(i),'×'+st.b[i],'neutral')});
+      if(st.w==null){
+        await banner(t('animTie'),'');act.forEach(c=>shake(c.el));
+        lanes.forEach(ln=>ln.querySelectorAll('.achips .kvic,.achips .ktrap').forEach(ch=>ch.classList.add('fizzle')));
+      }else{
+        cs.forEach((c,i)=>{
+          if(!c)return;
+          if(i===st.w){c.win=true;paint(c);A(c.el,[{transform:'scale(1)'},{transform:'scale(1.25) rotate(-5deg)'},{transform:'scale(1.1) rotate(3deg)'},{transform:'scale(1)'}],{duration:480,easing:'cubic-bezier(.3,1.6,.5,1)'});float(slot(i),t('animWin'),'up')}
+          else shake(c.el).then(()=>{c.lose=true;paint(c)});
+        });
+        lanes.forEach((ln,i)=>{if(i!==st.w)ln.querySelectorAll('.achips .kvic,.achips .ktrap').forEach(ch=>ch.classList.add('fizzle'))});
+      }
+      await sp(U*1.8);
+    }else if(st.k==='rem'||st.k==='disc'){
+      const src=chip(st.by,st.k==='disc'?'disc':'rem'+st.ty);
+      if(src){pop(src);await fly(src,nameEl(st.tgt))}if(gone())return;
+      shake(lanes[st.tgt]);
+      float(nameEl(st.tgt),st.k==='disc'?t('animCards',st.n):st.ok?`−1 ${ICON[st.ty]}`:t('noPts'),'down');
+      await sp(U*1.3);
+    }else if(st.k==='trapset'){
+      for(const c of st.c){const ch=chip(st.by,c);if(ch){ch.classList.add('armed');pop(ch)}}
+      float(nameEl(st.by),t('animTrap'),'trap');
+      await sp(U*1.2);
+    }
+  }
+  await sp(U*2.4);if(gone())return;
+  await A(arena,[{opacity:1},{opacity:0}],220);
+  if(arenaCtl===ctl)closeArena();
 }
 
 /* ------------------------------------------------------------------ events */
