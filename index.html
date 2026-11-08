@@ -467,7 +467,7 @@ function homeMsg(){return joinError||(online()?'Crea una sala y comparte el enla
 function homeHTML(){
   return `<section class="panel" id="home">
   <div class="stack"><label class="label" for="name">Tu nombre</label>
-  <div class="row"><input type="text" id="name" maxlength="16" placeholder="Manuel" value="${esc(myName)}" autocomplete="nickname"></div></div>
+  <div class="row"><input type="text" id="name" maxlength="16" placeholder="Tu nombre" value="${esc(myName)}" autocomplete="nickname"></div></div>
   <div class="row"><button class="btn primary" data-act="create" ${online()?'':'disabled'}>Crear sala</button>
   <button class="btn" data-act="solo">Jugar contra bots</button></div>
   <div class="stack"><label class="label" for="code">Unirse con código</label>
