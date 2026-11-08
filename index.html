@@ -133,44 +133,183 @@ footer{padding-bottom:24px}
 <div id="app"></div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-</body>
-</html>
 <script>
+/* ------------------------------------------------------------------ text (ES / EN) */
+const TXT={
+es:{
+  types:{R:'Piedra',P:'Papel',S:'Tijeras'},typesLow:{R:'piedra',P:'papel',S:'tijeras'},
+  kind:{inst:'Hechizo · esta ronda',vic:'Victoria · si ganas',trap:'Trampa · próxima ronda'},
+  pow:{
+    plus:['+3','+3 a tu carta PPoT'],
+    minus:['−3','−3 a la carta PPoT del rival','−3 a la carta PPoT de todos los rivales'],
+    duelo:['Duelo','Solo importan los números'],
+    inv:['Invertido','Piedra, papel o tijeras invertido'],
+    swap:['Intercambio','Se intercambian las cartas PPoT jugadas','Todos pasan su carta PPoT a la izquierda'],
+    remR:['Quitar ✊','Remueve un punto de piedra del rival'],
+    remP:['Quitar ✋','Remueve un punto de papel del rival'],
+    remS:['Quitar ✌️','Remueve un punto de tijeras del rival'],
+    disc:['Descarte','El rival descarta 3 cartas a ciegas'],
+    noR:['Sin ✊','El rival no puede jugar piedra','Los rivales no pueden jugar piedra'],
+    noP:['Sin ✋','El rival no puede jugar papel','Los rivales no pueden jugar papel'],
+    noS:['Sin ✌️','El rival no puede jugar tijeras','Los rivales no pueden jugar tijeras'],
+    tRP:['✊ → ✋','Transformar piedra a papel'],
+    tPS:['✋ → ✌️','Transformar papel a tijeras'],
+    tSR:['✌️ → ✊','Transformar tijeras a piedra'],
+    low:['Bajo gana','Gana el número más bajo']
+  },
+  langBtn:'EN',langAria:'Switch to English',
+  room:'Sala',round:'Ronda',deck:'Mazo',leave:'Salir',
+  rulesTitle:'Reglas rápidas',
+  rules:['Cada uno elige <strong>1 carta PPoT y 0-3 powerups</strong> boca abajo; se revelan a la vez.',
+    'Piedra gana a tijeras, tijeras a papel, papel a piedra. Mismo tipo: gana el número más alto. Mismo número: nadie gana.',
+    'El ganador guarda su carta PPoT como punto. Gana la partida: <strong>3 del mismo tipo</strong> o <strong>1 de cada tipo</strong>.',
+    'Robo: ganador 1, perdedor 3 (multijugador: 2). Empate: todos 2. Máximo 8 cartas en mano.',
+    'Multijugador: gana el que le gane a más cartas; si empatan, gana el número más alto.'],
+  rulesNote:'En este prototipo, el objetivo de las cartas Victoria se elige al jugarlas.',
+  yourName:'Tu nombre',create:'Crear sala',solo:'Jugar contra bots',joinCode:'Unirse con código',join:'Unirse',
+  homeOk:'Crea una sala y comparte el enlace y el código de 4 letras con tu equipo.',
+  homeOff:'No se pudo cargar la conexión online. Puedes probar contra bots.',
+  createFail:e=>`No se pudo crear la sala (${e}). Revisa tu conexión e inténtalo de nuevo.`,
+  codeLen:'El código tiene 4 letras.',connecting:'Conectando…',waitHost:'Esperando al host…',
+  noRoom:'No hay ninguna sala abierta con ese código. Revisa las letras o pide al host que la cree.',
+  connErr:e=>`Error de conexión (${e}). Inténtalo de nuevo.`,
+  creating:'Creando sala…',creatingSub:'Conectando con el servidor de salas.',
+  hostLost:'Se perdió la conexión con el host',
+  hostLostSub:'La partida vive en el navegador del host. Si cerró la pestaña, tendrá que crear otra sala y pasaros el código nuevo.',
+  localGame:'Partida local',roomCode:'Código de la sala',localNote:'Partida sin conexión contra bots.',
+  shareNote:'Tu equipo abre este mismo enlace y entra con el código.',
+  you:' (tú)',remove:'Quitar',bot:'Bot',host:'Host',ready:'Listo',addBot:'Añadir bot',start:'Empezar partida',
+  players24:'2-4 jugadores',waitStart:'Esperando a que el host empiece la partida…',
+  roundN:r=>`Ronda ${r}`,tieRound:'Empate: nadie gana la ronda',winsRound:n=>`${n} gana la ronda`,inPlay:'En juego',
+  flags:{duelo:'Duelo',inv:'Invertido',low:'Gana el más bajo',swap:'Intercambio'},
+  played:(a,b)=>`Jugó ${a}`+(b?`, terminó con ${b}`:''),noPlayable:'Sin carta jugable: pierde la ronda',beats:n=>`Gana a ${n}`,
+  players:'Jugadores',winner:'Ganador',picking:'Eligiendo',inHand:n=>`${n} cartas en mano`,noPts:'Sin puntos',botTag:'bot',
+  trapsFrom:n=>`Trampas activas · de ${n}`,notYou:' (no te afecta el bloqueo)',
+  winsGame:n=>`${n} gana la partida`,rematch:'Revancha',toLobby:'Volver a la sala',waitRematch:'Esperando a que el host empiece otra partida.',
+  log:'Registro',spectate:'Estás mirando la partida. Entra en la siguiente desde el lobby.',
+  yourHand:n=>`Tu mano · ${n} cartas`,blocked:t=>`Bloqueado: ${t}`,blockedTag:'Bloqueada',
+  sent:(c,w)=>`Enviado${c?': '+c:''}. ${w?`Esperando a ${w}.`:'Resolviendo…'}`,change:'Cambiar',
+  discardN:(h,n)=>`Tienes ${h} cartas: toca ${n} para descartar.`,readyBtn:'Listo',accept:'Aceptar',
+  cantPlay:'No tienes ninguna carta PPoT jugable: pierdes la ronda.',pick:'Elige 1 carta PPoT y hasta 3 powerups.',
+  targetLabel:'si ganas, afecta a',
+  hBlocked:'Esa carta está bloqueada esta ronda.',hMax3:'Máximo 3 powerups por ronda.',hBlk1:'Máximo 1 carta de bloqueo.',
+  hSendFail:'No se pudo enviar. Revisa la conexión.',
+  L:{
+    start:()=>'Empieza la partida',shuffle:()=>'Se baraja la pila de descarte',
+    noRPS:n=>`${n} no tenía cartas PPoT: descarta su mano y roba 7`,
+    tie:r=>`Ronda ${r}: empate, nadie gana`,win:(r,n,c)=>`Ronda ${r}: ${n} gana con ${c}`,
+    disc:(n,k)=>`${n} descarta ${k} cartas a ciegas`,
+    rem:(n,t,x)=>`${n} quita un punto de ${t} a ${x}`,remNone:(x,t)=>`${x} no tenía puntos de ${t}`,
+    trap:l=>`Trampa activa la próxima ronda: ${l}`,gameWin:n=>`${n} gana la partida`,
+    away:n=>`${n} se desconectó; juega un bot por él`,back:n=>`${n} volvió a la partida`
+  }
+},
+en:{
+  types:{R:'Rock',P:'Paper',S:'Scissors'},typesLow:{R:'rock',P:'paper',S:'scissors'},
+  kind:{inst:'Spell · this round',vic:'Victory · if you win',trap:'Trap · next round'},
+  pow:{
+    plus:['+3','+3 to your RPS card'],
+    minus:['−3','−3 to the rival’s RPS card','−3 to every rival’s RPS card'],
+    duelo:['Duel','Only the numbers matter'],
+    inv:['Reversed','Rock, paper, scissors reversed'],
+    swap:['Swap','The played RPS cards are swapped','Everyone passes their RPS card to the left'],
+    remR:['Remove ✊','Remove one rock point from the rival'],
+    remP:['Remove ✋','Remove one paper point from the rival'],
+    remS:['Remove ✌️','Remove one scissors point from the rival'],
+    disc:['Discard','The rival discards 3 cards at random'],
+    noR:['No ✊','The rival can’t play rock','Rivals can’t play rock'],
+    noP:['No ✋','The rival can’t play paper','Rivals can’t play paper'],
+    noS:['No ✌️','The rival can’t play scissors','Rivals can’t play scissors'],
+    tRP:['✊ → ✋','Turn rock into paper'],
+    tPS:['✋ → ✌️','Turn paper into scissors'],
+    tSR:['✌️ → ✊','Turn scissors into rock'],
+    low:['Low wins','The lowest number wins']
+  },
+  langBtn:'ES',langAria:'Cambiar a español',
+  room:'Room',round:'Round',deck:'Deck',leave:'Leave',
+  rulesTitle:'Quick rules',
+  rules:['Everyone picks <strong>1 RPS card and 0-3 power-ups</strong> face down; they’re revealed at the same time.',
+    'Rock beats scissors, scissors beat paper, paper beats rock. Same type: the higher number wins. Same number: nobody wins.',
+    'The winner keeps their RPS card as a point. Win the game with <strong>3 of the same type</strong> or <strong>1 of each type</strong>.',
+    'Draws: winner 1, loser 3 (multiplayer: 2). Tie: everyone 2. Max 8 cards in hand.',
+    'Multiplayer: whoever beats the most cards wins; on a tie, the highest number wins.'],
+  rulesNote:'In this prototype, Victory card targets are chosen when you play them.',
+  yourName:'Your name',create:'Create room',solo:'Play against bots',joinCode:'Join with a code',join:'Join',
+  homeOk:'Create a room and share the link and the 4-letter code with your team.',
+  homeOff:'The online connection couldn’t load. You can still play against bots.',
+  createFail:e=>`Couldn’t create the room (${e}). Check your connection and try again.`,
+  codeLen:'The code has 4 letters.',connecting:'Connecting…',waitHost:'Waiting for the host…',
+  noRoom:'There’s no open room with that code. Check the letters or ask the host to create it.',
+  connErr:e=>`Connection error (${e}). Try again.`,
+  creating:'Creating room…',creatingSub:'Connecting to the room server.',
+  hostLost:'Lost the connection to the host',
+  hostLostSub:'The game runs in the host’s browser. If they closed the tab, they’ll need to create a new room and share the new code.',
+  localGame:'Local game',roomCode:'Room code',localNote:'Offline game against bots.',
+  shareNote:'Your team opens this same link and joins with the code.',
+  you:' (you)',remove:'Remove',bot:'Bot',host:'Host',ready:'Ready',addBot:'Add bot',start:'Start game',
+  players24:'2-4 players',waitStart:'Waiting for the host to start the game…',
+  roundN:r=>`Round ${r}`,tieRound:'Tie: nobody wins the round',winsRound:n=>`${n} wins the round`,inPlay:'In play',
+  flags:{duelo:'Duel',inv:'Reversed',low:'Low wins',swap:'Swap'},
+  played:(a,b)=>`Played ${a}`+(b?`, ended with ${b}`:''),noPlayable:'No playable card: loses the round',beats:n=>`Beats ${n}`,
+  players:'Players',winner:'Winner',picking:'Picking',inHand:n=>`${n} cards in hand`,noPts:'No points',botTag:'bot',
+  trapsFrom:n=>`Active traps · from ${n}`,notYou:' (the block doesn’t affect you)',
+  winsGame:n=>`${n} wins the game`,rematch:'Rematch',toLobby:'Back to the room',waitRematch:'Waiting for the host to start another game.',
+  log:'Log',spectate:'You’re watching this game. Join the next one from the lobby.',
+  yourHand:n=>`Your hand · ${n} cards`,blocked:t=>`Blocked: ${t}`,blockedTag:'Blocked',
+  sent:(c,w)=>`Sent${c?': '+c:''}. ${w?`Waiting for ${w}.`:'Resolving…'}`,change:'Change',
+  discardN:(h,n)=>`You have ${h} cards: tap ${n} to discard.`,readyBtn:'Ready',accept:'OK',
+  cantPlay:'You have no playable RPS card: you lose the round.',pick:'Pick 1 RPS card and up to 3 power-ups.',
+  targetLabel:'if you win, it hits',
+  hBlocked:'That card is blocked this round.',hMax3:'Max 3 power-ups per round.',hBlk1:'Max 1 block card.',
+  hSendFail:'Couldn’t send. Check your connection.',
+  L:{
+    start:()=>'The game starts',shuffle:()=>'The discard pile is shuffled',
+    noRPS:n=>`${n} had no RPS cards: discards their hand and draws 7`,
+    tie:r=>`Round ${r}: tie, nobody wins`,win:(r,n,c)=>`Round ${r}: ${n} wins with ${c}`,
+    disc:(n,k)=>`${n} discards ${k} cards at random`,
+    rem:(n,t,x)=>`${n} removes a ${t} point from ${x}`,remNone:(x,t)=>`${x} had no ${t} points`,
+    trap:l=>`Trap active next round: ${l}`,gameWin:n=>`${n} wins the game`,
+    away:n=>`${n} disconnected; a bot plays for them`,back:n=>`${n} is back in the game`
+  }
+}};
+let lang='es';
+try{lang=localStorage.getItem('coc-lang')||((navigator.language||'es').toLowerCase().startsWith('es')?'es':'en')}catch(e){}
+if(!TXT[lang])lang='es';
+document.documentElement.lang=lang;
+const T=()=>TXT[lang];
+function t(k,...a){const v=T()[k];return typeof v==='function'?v(...a):v}
+const msg=x=>Array.isArray(x)?t(...x):(x||'');
+
 /* ------------------------------------------------------------------ data */
-const TYPES={R:{n:'Piedra',i:'✊'},P:{n:'Papel',i:'✋'},S:{n:'Tijeras',i:'✌️'}};
+const ICON={R:'✊',P:'✋',S:'✌️'};
 const BEATS={R:'S',S:'P',P:'R'};
 const POW={
-  plus:{k:'inst',t:'+3',d:'+3 a tu carta PPoT'},
-  minus:{k:'inst',t:'−3',d:'−3 a la carta PPoT del rival',dm:'−3 a la carta PPoT de todos los rivales'},
-  duelo:{k:'inst',t:'Duelo',d:'Solo importan los números'},
-  inv:{k:'inst',t:'Invertido',d:'Piedra, papel o tijeras invertido'},
-  swap:{k:'inst',t:'Intercambio',d:'Se intercambian las cartas PPoT jugadas',dm:'Todos pasan su carta PPoT a la izquierda'},
-  remR:{k:'vic',t:'Quitar ✊',d:'Remueve un punto de piedra del rival',tgt:1},
-  remP:{k:'vic',t:'Quitar ✋',d:'Remueve un punto de papel del rival',tgt:1},
-  remS:{k:'vic',t:'Quitar ✌️',d:'Remueve un punto de tijeras del rival',tgt:1},
-  disc:{k:'vic',t:'Descarte',d:'El rival descarta 3 cartas a ciegas',tgt:1},
-  noR:{k:'trap',t:'Sin ✊',d:'El rival no puede jugar piedra',dm:'Los rivales no pueden jugar piedra',blk:'R'},
-  noP:{k:'trap',t:'Sin ✋',d:'El rival no puede jugar papel',dm:'Los rivales no pueden jugar papel',blk:'P'},
-  noS:{k:'trap',t:'Sin ✌️',d:'El rival no puede jugar tijeras',dm:'Los rivales no pueden jugar tijeras',blk:'S'},
-  tRP:{k:'trap',t:'✊ → ✋',d:'Transformar piedra a papel',tf:['R','P']},
-  tPS:{k:'trap',t:'✋ → ✌️',d:'Transformar papel a tijeras',tf:['P','S']},
-  tSR:{k:'trap',t:'✌️ → ✊',d:'Transformar tijeras a piedra',tf:['S','R']},
-  low:{k:'trap',t:'Bajo gana',d:'Gana el número más bajo'}
+  plus:{k:'inst'},minus:{k:'inst',m:1},duelo:{k:'inst'},inv:{k:'inst'},swap:{k:'inst',m:1},
+  remR:{k:'vic',tgt:1},remP:{k:'vic',tgt:1},remS:{k:'vic',tgt:1},disc:{k:'vic',tgt:1},
+  noR:{k:'trap',m:1,blk:'R'},noP:{k:'trap',m:1,blk:'P'},noS:{k:'trap',m:1,blk:'S'},
+  tRP:{k:'trap',tf:['R','P']},tPS:{k:'trap',tf:['P','S']},tSR:{k:'trap',tf:['S','R']},low:{k:'trap'}
 };
-const KIND={inst:'Hechizo · esta ronda',vic:'Victoria · si ganas',trap:'Trampa · próxima ronda'};
 const isRPS=c=>typeof c==='string'&&/^[RPS]\d{1,2}$/.test(c);
-const fmt=c=>isRPS(c)?TYPES[c[0]].i+c.slice(1):(POW[c]?POW[c].t:'?');
-const desc=(c,n)=>{const p=POW[c];return (n>=3&&p.dm)?p.dm:p.d};
+const ptitle=c=>T().pow[c][0];
+const pdesc=(c,n)=>{const p=T().pow[c];return (n>=3&&p[2])?p[2]:p[1]};
+const fmt=c=>isRPS(c)?ICON[c[0]]+c.slice(1):(POW[c]?ptitle(c):'?');
 const rnd=n=>Math.floor(Math.random()*n);
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function cleanName(s){return String(s||'').replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯﻿]/g,'').trim().slice(0,16)||'Jugador'}
+function cleanName(s){return String(s||'').replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯﻿]/g,'').trim().slice(0,16)||'Player'}
 function buildDeck(){const d=[];for(const t of 'RPS')for(let v=1;v<=10;v++){d.push(t+v,t+v)}return d.concat(Object.keys(POW))}
 
-/* ------------------------------------------------------------------ engine (host only) */
-function log(G,s){G.log.push(s);if(G.log.length>30)G.log.shift()}
-function draw(G,s,n){for(let i=0;i<n;i++){if(!G.deck.length){if(!G.disc.length)break;G.deck=shuffle(G.disc);G.disc=[];log(G,'Se baraja la pila de descarte')}s.hand.push(G.deck.pop())}}
-function fixNoRPS(G,s){if(!s.hand.some(isRPS)){G.disc.push(...s.hand);s.hand=[];draw(G,s,7);log(G,`${s.name} no tenía cartas PPoT: descarta su mano y roba 7`)}}
+/* ------------------------------------------------------------------ engine (host only); log lines are stored as keys so each player reads them in their own language */
+function log(G,...e){G.log.push(e);if(G.log.length>30)G.log.shift()}
+function logText(e){
+  const L=T().L,[k,...a]=e;if(!L[k])return '';
+  if(k==='rem')return L.rem(a[0],T().typesLow[a[1]],a[2]);
+  if(k==='remNone')return L.remNone(a[0],T().typesLow[a[1]]);
+  if(k==='trap')return L.trap((a[0]||[]).map(c=>POW[c]?ptitle(c):'?').join(', '));
+  return L[k](...a);
+}
+function draw(G,s,n){for(let i=0;i<n;i++){if(!G.deck.length){if(!G.disc.length)break;G.deck=shuffle(G.disc);G.disc=[];log(G,'shuffle')}s.hand.push(G.deck.pop())}}
+function fixNoRPS(G,s){if(!s.hand.some(isRPS)){G.disc.push(...s.hand);s.hand=[];draw(G,s,7);log(G,'noRPS',s.name)}}
 function blockedFor(tr,seat){if(!tr||tr.o===seat)return null;const b=tr.c.find(c=>POW[c]&&POW[c].blk);return b?POW[b].blk:null}
 const canPlay=(tr,seat,c)=>isRPS(c)&&c[0]!==blockedFor(tr,seat);
 function hasSet(pts){const n={R:0,P:0,S:0};pts.forEach(c=>n[c[0]]++);return n.R>=3||n.P>=3||n.S>=3||(n.R&&n.P&&n.S)}
@@ -191,9 +330,9 @@ function cleanSub(G,i,sub){
   }
   const tg={};
   for(const c of pw)if(POW[c].tgt){
-    let t=sub&&sub.tg?sub.tg[c]:undefined;
-    if(!(Number.isInteger(t)&&t>=0&&t<n&&t!==i))t=n===2?1-i:[...Array(n).keys()].find(k=>k!==i);
-    tg[c]=t;
+    let x=sub&&sub.tg?sub.tg[c]:undefined;
+    if(!(Number.isInteger(x)&&x>=0&&x<n&&x!==i))x=n===2?1-i:[...Array(n).keys()].find(k=>k!==i);
+    tg[c]=x;
   }
   s.hand=hand;G.disc.push(...dc);
   return {pp,pw,tg};
@@ -214,11 +353,11 @@ function botDecide(G,i){
 function resolve(G,subs){
   const n=G.seats.length,multi=n>=3;
   const P=G.seats.map((s,i)=>cleanSub(G,i,subs[i]));
-  const T=G.traps?G.traps.c:[];
-  const tf={};T.forEach(c=>{if(POW[c].tf)tf[POW[c].tf[0]]=POW[c].tf[1]});
-  const low=T.includes('low');
+  const TR=G.traps?G.traps.c:[];
+  const tf={};TR.forEach(c=>{if(POW[c].tf)tf[POW[c].tf[0]]=POW[c].tf[1]});
+  const low=TR.includes('low');
   let cards=P.map(p=>p.pp?{code:p.pp,t:p.pp[0],v:+p.pp.slice(1)}:null);
-  // Intercambio: only the PPoT cards move, power cards stay with their owner
+  // Swap: only the RPS cards move, power cards stay with their owner
   const swaps=P.reduce((a,p)=>a+p.pw.filter(c=>c==='swap').length,0);
   const act=cards.map((c,i)=>c?i:-1).filter(i=>i>=0);
   if(swaps&&act.length>=2){
@@ -239,7 +378,7 @@ function resolve(G,subs){
     if(duelo||a.f===b.f)return better(a,b);
     return inv?BEATS[b.f]===a.f:BEATS[a.f]===b.f;
   };
-  const counts=cards.map((a,i)=>a?cards.reduce((t,b,j)=>t+(b&&j!==i&&beats(a,b)?1:0),0):-1);
+  const counts=cards.map((a,i)=>a?cards.reduce((s,b,j)=>s+(b&&j!==i&&beats(a,b)?1:0),0):-1);
   let w=null;
   if(act.length){
     const max=Math.max(...counts);
@@ -259,31 +398,30 @@ function resolve(G,subs){
   });
   if(G.traps)G.disc.push(...G.traps.c);
   G.traps=null;
-  if(w==null){log(G,`Ronda ${G.round}: empate, nadie gana`)}
+  if(w==null)log(G,'tie',G.round);
   else{
     const s=G.seats[w];s.pts.push(cards[w].code);
-    log(G,`Ronda ${G.round}: ${s.name} gana con ${TYPES[cards[w].f].i}${cards[w].fv}`);
+    log(G,'win',G.round,s.name,ICON[cards[w].f]+cards[w].fv);
     P[w].pw.forEach(c=>{
-      if(POW[c].tgt){
-        const tg=G.seats[P[w].tg[c]];if(!tg)return;
-        if(c==='disc'){
-          const k=Math.min(3,tg.hand.length);
-          for(let x=0;x<k;x++)G.disc.push(tg.hand.splice(rnd(tg.hand.length),1)[0]);
-          log(G,`${tg.name} descarta ${k} cartas a ciegas`);
-        }else{
-          const t=c[3];const k=tg.pts.findIndex(x=>x[0]===t);
-          if(k>=0){G.disc.push(tg.pts.splice(k,1)[0]);log(G,`${s.name} quita un punto de ${TYPES[t].n.toLowerCase()} a ${tg.name}`)}
-          else log(G,`${tg.name} no tenía puntos de ${TYPES[t].n.toLowerCase()}`);
-        }
+      if(!POW[c].tgt)return;
+      const tg=G.seats[P[w].tg[c]];if(!tg)return;
+      if(c==='disc'){
+        const k=Math.min(3,tg.hand.length);
+        for(let x=0;x<k;x++)G.disc.push(tg.hand.splice(rnd(tg.hand.length),1)[0]);
+        log(G,'disc',tg.name,k);
+      }else{
+        const ty=c[3];const k=tg.pts.findIndex(x=>x[0]===ty);
+        if(k>=0){G.disc.push(tg.pts.splice(k,1)[0]);log(G,'rem',s.name,ty,tg.name)}
+        else log(G,'remNone',tg.name,ty);
       }
     });
     const tr=P[w].pw.filter(c=>POW[c].k==='trap');
-    if(tr.length){G.traps={o:w,c:tr};log(G,`Trampa activa la próxima ronda: ${tr.map(c=>POW[c].t).join(', ')}`)}
+    if(tr.length){G.traps={o:w,c:tr};log(G,'trap',tr)}
   }
   G.seats.forEach((s,i)=>draw(G,s,w==null?2:i===w?1:(multi?2:3)));
   G.seats.forEach(s=>fixNoRPS(G,s));
   G.last=L;
-  if(w!=null&&hasSet(G.seats[w].pts)){G.phase='over';G.winner=w;log(G,`${G.seats[w].name} gana la partida`)}
+  if(w!=null&&hasSet(G.seats[w].pts)){G.phase='over';G.winner=w;log(G,'gameWin',G.seats[w].name)}
   else G.round++;
 }
 
@@ -299,7 +437,7 @@ const freshSel=()=>({pp:null,pw:[],dc:[],tg:{}});
 const online=()=>typeof Peer!=='undefined';
 
 function genCode(){const A='ABCDEFGHJKMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=A[rnd(A.length)];return s}
-function saveName(){myName=cleanName(document.getElementById('name').value);try{localStorage.setItem('coc-name',myName)}catch(e){}}
+function saveName(){const el=document.getElementById('name');if(!el)return;myName=cleanName(el.value);try{localStorage.setItem('coc-name',myName)}catch(e){}}
 window.addEventListener('beforeunload',e=>{if(mode==='host'&&G&&!G.local&&G.seats.length>1){e.preventDefault();e.returnValue=''}});
 
 /* ---- host: the host's browser runs the game and sends each player only their own hand */
@@ -324,7 +462,7 @@ function openHost(tries){
   peer.on('open',()=>{G={phase:'lobby',code,local:false,seats:[{id:'host',name:myName,bot:false}],round:0,log:[]};publish()});
   peer.on('error',err=>{
     if(err.type==='unavailable-id'&&tries<5&&!G){peer.destroy();openHost(tries+1);return}
-    if(!G){mode='home';joinError='No se pudo crear la sala ('+err.type+'). Revisa tu conexión e inténtalo de nuevo.';render(true)}
+    if(!G){mode='home';joinError=['createFail',err.type];render(true)}
     else console.warn('peer',err.type);
   });
   peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
@@ -339,7 +477,7 @@ function onHostMsg(conn,m){
   if(m.t==='hello'){
     const name=cleanName(m.name);
     if(G.phase==='lobby'){if(!G.seats.some(s=>s.id===conn.peer)&&G.seats.length<4)G.seats.push({id:conn.peer,name,bot:false})}
-    else{const s=G.seats.find(s=>s.away&&s.name===name);if(s){s.id=conn.peer;s.bot=false;s.away=false;log(G,`${s.name} volvió a la partida`)}}
+    else{const s=G.seats.find(s=>s.away&&s.name===name);if(s){s.id=conn.peer;s.bot=false;s.away=false;log(G,'back',s.name)}}
     hostTick();
   }else if(m.t==='sub'){subs[conn.peer]=m.sub;hostTick()}
   else if(m.t==='unsub'){delete subs[conn.peer];hostTick()}
@@ -347,7 +485,7 @@ function onHostMsg(conn,m){
 function onLeave(id){
   if(!G)return;
   if(G.phase==='lobby')G.seats=G.seats.filter(s=>s.id!==id);
-  else{const s=G.seats.find(s=>s.id===id&&!s.bot);if(s){s.bot=true;s.away=true;log(G,`${s.name} se desconectó; juega un bot por él`)}}
+  else{const s=G.seats.find(s=>s.id===id&&!s.bot);if(s){s.bot=true;s.away=true;log(G,'away',s.name)}}
   hostTick();
 }
 function hostTick(){if(!G)return;if(G.phase==='pick')tryResolve();publish()}
@@ -370,7 +508,7 @@ function startGame(){
   Object.assign(G,{gid:Math.random().toString(36).slice(2,8),phase:'pick',round:1,deck:shuffle(buildDeck()),disc:[],traps:null,last:null,log:[],winner:null,ready:[]});
   G.seats.forEach(s=>{s.hand=[];s.pts=[];draw(G,s,7)});
   G.seats.forEach(s=>fixNoRPS(G,s));
-  log(G,'Empieza la partida');subs={};mySub=null;sel=freshSel();hint='';
+  log(G,'start');subs={};mySub=null;sel=freshSel();hint='';
   hostTick();
 }
 
@@ -378,13 +516,13 @@ function startGame(){
 function guestJoin(){
   saveName();
   const code=document.getElementById('code').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
-  if(code.length!==4){joinError='El código tiene 4 letras.';render(true);return}
-  joinError='';mode='guest';guestCode=code;view=null;hostGone=false;mySub=null;sel=freshSel();lastKey='';status='Conectando…';
+  if(code.length!==4){joinError=['codeLen'];render(true);return}
+  joinError='';mode='guest';guestCode=code;view=null;hostGone=false;mySub=null;sel=freshSel();lastKey='';status=['connecting'];
   render();
   peer=new Peer();
   peer.on('open',()=>{
     hostConn=peer.connect(PREFIX+code.toLowerCase(),{reliable:true});
-    hostConn.on('open',()=>{hostConn.send({t:'hello',name:myName});status='Esperando al host…';render()});
+    hostConn.on('open',()=>{hostConn.send({t:'hello',name:myName});status=['waitHost'];render()});
     hostConn.on('data',m=>{
       if(!m||m.t!=='state'||!m.v)return;
       const v=m.v,key=v.gid+':'+v.r+':'+v.ph;
@@ -394,7 +532,7 @@ function guestJoin(){
     hostConn.on('close',()=>{hostGone=true;render()});
   });
   peer.on('error',err=>{
-    status=err.type==='peer-unavailable'?'No hay ninguna sala abierta con ese código. Revisa las letras o pide al host que la cree.':'Error de conexión ('+err.type+'). Inténtalo de nuevo.';
+    status=err.type==='peer-unavailable'?['noRoom']:['connErr',err.type];
     if(view)hostGone=true;render();
   });
 }
@@ -406,6 +544,7 @@ function leave(){
 /* ---- my actions */
 function mySeat(){return view&&Number.isInteger(view.you)?view.you:-1}
 function myHand(){const i=mySeat();return i>=0&&view.seats[i].h?view.seats[i].h:[]}
+function setHint(k){hint=[k];hintWarn=true}
 function tapCard(i){
   const hand=myHand();const c=hand[i];if(c==null||mySub)return;
   hint='';hintWarn=false;
@@ -415,21 +554,21 @@ function tapCard(i){
     if(sel.pp===i)sel.pp=null;sel.pw=sel.pw.filter(x=>x!==i);sel.dc.push(i);render();return;
   }
   if(isRPS(c)){
-    if(!canPlay(view.tr,mySeat(),c)){hint='Esa carta está bloqueada esta ronda.';hintWarn=true}
+    if(!canPlay(view.tr,mySeat(),c))setHint('hBlocked');
     else sel.pp=sel.pp===i?null:i;
   }else if(sel.pw.includes(i)){sel.pw=sel.pw.filter(x=>x!==i);delete sel.tg[c]}
-  else if(sel.pw.length>=3){hint='Máximo 3 powerups por ronda.';hintWarn=true}
-  else if(POW[c].blk&&sel.pw.some(k=>POW[hand[k]].blk)){hint='Máximo 1 carta de bloqueo.';hintWarn=true}
+  else if(sel.pw.length>=3)setHint('hMax3');
+  else if(POW[c].blk&&sel.pw.some(k=>POW[hand[k]].blk))setHint('hBlk1');
   else sel.pw.push(i);
   render();
 }
 function submit(){
   const hand=myHand();const n=view.n;const me=mySeat();
   const sub={g:view.gid,r:view.r,pp:sel.pp!=null?hand[sel.pp]:null,pw:sel.pw.map(i=>hand[i]),dc:sel.dc.map(i=>hand[i]),tg:{}};
-  sub.pw.forEach(c=>{if(POW[c].tgt){const t=sel.tg[c];sub.tg[c]=Number.isInteger(t)?t:(n===2?1-me:[...Array(n).keys()].find(k=>k!==me))}});
+  sub.pw.forEach(c=>{if(POW[c].tgt){const x=sel.tg[c];sub.tg[c]=Number.isInteger(x)?x:(n===2?1-me:[...Array(n).keys()].find(k=>k!==me))}});
   mySub=sub;hint='';
   if(mode==='host')hostTick();
-  else{try{hostConn.send({t:'sub',sub})}catch(e){hint='No se pudo enviar. Revisa la conexión.';hintWarn=true;mySub=null}render()}
+  else{try{hostConn.send({t:'sub',sub})}catch(e){setHint('hSendFail');mySub=null}render()}
 }
 function unsubmit(){
   mySub=null;
@@ -439,39 +578,33 @@ function unsubmit(){
 /* ------------------------------------------------------------------ render */
 const app=document.getElementById('app');
 function cardHTML(c,i,cls){
-  if(isRPS(c)){const t=c[0];return `<button class="card t${t} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}" aria-label="${TYPES[t].n} ${c.slice(1)}"><span class="cv">${c.slice(1)}</span><span class="ci" aria-hidden="true">${TYPES[t].i}</span><span class="cn">${TYPES[t].n}</span>${cls.includes('blocked')?'<span class="tag">Bloqueada</span>':''}</button>`}
-  const p=POW[c];return `<button class="card k${p.k} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}"><span class="kind">${KIND[p.k]}</span><span class="ptitle">${esc(p.t)}</span><span class="pdesc">${esc(desc(c,view.n))}</span></button>`;
+  if(isRPS(c)){const ty=c[0];return `<button class="card t${ty} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}" aria-label="${T().types[ty]} ${c.slice(1)}"><span class="cv">${c.slice(1)}</span><span class="ci" aria-hidden="true">${ICON[ty]}</span><span class="cn">${T().types[ty]}</span>${cls.includes('blocked')?`<span class="tag">${t('blockedTag')}</span>`:''}</button>`}
+  const p=POW[c];return `<button class="card k${p.k} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}"><span class="kind">${T().kind[p.k]}</span><span class="ptitle">${esc(ptitle(c))}</span><span class="pdesc">${esc(pdesc(c,view.n))}</span></button>`;
 }
-const pill=c=>`<span class="pill k${POW[c].k}">${esc(POW[c].t)}</span>`;
-function ptsHTML(pts){return pts.length?pts.map(c=>`<span class="pt t${c[0]}">${TYPES[c[0]].i} ${c.slice(1)}</span>`).join(''):'<span class="pt empty small">Sin puntos</span>'}
+const pill=c=>`<span class="pill k${POW[c].k}">${esc(ptitle(c))}</span>`;
+function ptsHTML(pts){return pts.length?pts.map(c=>`<span class="pt t${c[0]}">${ICON[c[0]]} ${c.slice(1)}</span>`).join(''):`<span class="pt empty small">${t('noPts')}</span>`}
 
 function header(){
   const chips=[];
   if(view&&mode!=='home'){
-    chips.push(`<span class="chip">Sala <strong>${esc(view.code)}</strong></span>`);
-    if(view.ph!=='lobby')chips.push(`<span class="chip">Ronda <strong>${view.r}</strong></span>`,`<span class="chip">Mazo <strong>${view.dk}</strong></span>`);
+    chips.push(`<span class="chip">${t('room')} <strong>${esc(view.code)}</strong></span>`);
+    if(view.ph!=='lobby')chips.push(`<span class="chip">${t('round')} <strong>${view.r}</strong></span>`,`<span class="chip">${t('deck')} <strong>${view.dk}</strong></span>`);
   }
-  return `<div class="topbar"><h1 class="brand">Cards of <b>Chaos</b></h1><div class="meta">${chips.join('')}${mode!=='home'?'<button class="btn sm" data-act="leave">Salir</button>':''}</div></div>`;
+  return `<div class="topbar"><h1 class="brand">Cards of <b>Chaos</b></h1><div class="meta">${chips.join('')}<button class="btn sm" data-act="lang" aria-label="${t('langAria')}">${t('langBtn')}</button>${mode!=='home'?`<button class="btn sm" data-act="leave">${t('leave')}</button>`:''}</div></div>`;
 }
 function rulesHTML(){
-  return `<details class="rules"><summary>Reglas rápidas</summary><ul>
-<li>Cada uno elige <strong>1 carta PPoT y 0-3 powerups</strong> boca abajo; se revelan a la vez.</li>
-<li>Piedra gana a tijeras, tijeras a papel, papel a piedra. Mismo tipo: gana el número más alto. Mismo número: nadie gana.</li>
-<li>El ganador guarda su carta PPoT como punto. Gana la partida: <strong>3 del mismo tipo</strong> o <strong>1 de cada tipo</strong>.</li>
-<li>Robo: ganador 1, perdedor 3 (multijugador: 2). Empate: todos 2. Máximo 8 cartas en mano.</li>
-<li>Multijugador: gana el que le gane a más cartas; si empatan, gana el número más alto.</li>
-<li class="muted">En este prototipo, el objetivo de las cartas Victoria se elige al jugarlas.</li></ul></details>`;
+  return `<details class="rules" id="rules"><summary>${t('rulesTitle')}</summary><ul>${T().rules.map(r=>`<li>${r}</li>`).join('')}<li class="muted">${t('rulesNote')}</li></ul></details>`;
 }
 
-function homeMsg(){return joinError||(online()?'Crea una sala y comparte el enlace y el código de 4 letras con tu equipo.':'No se pudo cargar la conexión online. Puedes probar contra bots.')}
-function homeHTML(){
+function homeMsg(){return msg(joinError)||(online()?t('homeOk'):t('homeOff'))}
+function homeHTML(code){
   return `<section class="panel" id="home">
-  <div class="stack"><label class="label" for="name">Tu nombre</label>
-  <div class="row"><input type="text" id="name" maxlength="16" placeholder="Tu nombre" value="${esc(myName)}" autocomplete="nickname"></div></div>
-  <div class="row"><button class="btn primary" data-act="create" ${online()?'':'disabled'}>Crear sala</button>
-  <button class="btn" data-act="solo">Jugar contra bots</button></div>
-  <div class="stack"><label class="label" for="code">Unirse con código</label>
-  <div class="row"><input type="text" id="code" class="code" maxlength="4" placeholder="ABCD" autocomplete="off"><button class="btn" data-act="join" ${online()?'':'disabled'}>Unirse</button></div></div>
+  <div class="stack"><label class="label" for="name">${t('yourName')}</label>
+  <div class="row"><input type="text" id="name" maxlength="16" placeholder="${t('yourName')}" value="${esc(myName)}" autocomplete="nickname"></div></div>
+  <div class="row"><button class="btn primary" data-act="create" ${online()?'':'disabled'}>${t('create')}</button>
+  <button class="btn" data-act="solo">${t('solo')}</button></div>
+  <div class="stack"><label class="label" for="code">${t('joinCode')}</label>
+  <div class="row"><input type="text" id="code" class="code" maxlength="4" placeholder="ABCD" autocomplete="off" value="${esc(code||'')}"><button class="btn" data-act="join" ${online()?'':'disabled'}>${t('join')}</button></div></div>
   <p class="small ${joinError?'err':'muted'}" id="homestatus">${esc(homeMsg())}</p>
 </section>${rulesHTML()}`;
 }
@@ -479,96 +612,106 @@ function homeHTML(){
 function lobbyHTML(){
   const host=mode==='host';const local=!!view.local;
   return `<section class="panel">
-  <div class="label">${local?'Partida local':'Código de la sala'}</div>
-  ${local?'<p class="muted">Partida sin conexión contra bots.</p>':`<div class="bigcode">${esc(view.code)}</div><p class="muted small">Tu equipo abre este mismo enlace y entra con el código.</p>`}
-  <div class="seats">${view.seats.map((s,i)=>`<div class="seat ${i===mySeat()?'me':''}"><div class="seat-top"><span class="seat-name">${esc(s.n)}${i===mySeat()?' (tú)':''}</span>${host&&s.b?`<button class="btn sm" data-act="rmbot" data-i="${i}">Quitar</button>`:`<span class="status wait">${s.b?'Bot':i===0?'Host':'Listo'}</span>`}</div></div>`).join('')}</div>
-  ${host?`<div class="row"><button class="btn" data-act="addbot" ${view.seats.length>=4?'disabled':''}>Añadir bot</button><button class="btn primary" data-act="start" ${view.seats.length<2?'disabled':''}>Empezar partida</button><span class="small muted">2-4 jugadores</span></div>`:`<p class="muted">Esperando a que el host empiece la partida…</p>`}
+  <div class="label">${local?t('localGame'):t('roomCode')}</div>
+  ${local?`<p class="muted">${t('localNote')}</p>`:`<div class="bigcode">${esc(view.code)}</div><p class="muted small">${t('shareNote')}</p>`}
+  <div class="seats">${view.seats.map((s,i)=>`<div class="seat ${i===mySeat()?'me':''}"><div class="seat-top"><span class="seat-name">${esc(s.n)}${i===mySeat()?t('you'):''}</span>${host&&s.b?`<button class="btn sm" data-act="rmbot" data-i="${i}">${t('remove')}</button>`:`<span class="status wait">${s.b?t('bot'):i===0?t('host'):t('ready')}</span>`}</div></div>`).join('')}</div>
+  ${host?`<div class="row"><button class="btn" data-act="addbot" ${view.seats.length>=4?'disabled':''}>${t('addBot')}</button><button class="btn primary" data-act="start" ${view.seats.length<2?'disabled':''}>${t('start')}</button><span class="small muted">${t('players24')}</span></div>`:`<p class="muted">${t('waitStart')}</p>`}
 </section>${rulesHTML()}`;
 }
 
 function lastHTML(){
   const L=view.last;if(!L)return '';
-  const multi=view.n>=3;
+  const multi=view.n>=3,F=T().flags;
   const flags=[];
-  if(L.flags.duelo)flags.push('Duelo');if(L.flags.inv)flags.push('Invertido');if(L.flags.low)flags.push('Gana el más bajo');if(L.flags.swap)flags.push('Intercambio');
-  (L.flags.tf||[]).forEach(t=>flags.push(`${TYPES[t[0]].i} → ${TYPES[t[1]].i}`));
-  return `<section class="panel"><div class="label">Ronda ${L.r}</div>
-  <div class="headline">${L.w==null?'Empate: nadie gana la ronda':`${esc(view.seats[L.w].n)} gana la ronda`}</div>
-  ${flags.length?`<div class="small muted">En juego: ${esc(flags.join(' · '))}</div>`:''}
+  ['duelo','inv','low','swap'].forEach(k=>{if(L.flags[k])flags.push(F[k])});
+  (L.flags.tf||[]).forEach(x=>flags.push(`${ICON[x[0]]} → ${ICON[x[1]]}`));
+  return `<section class="panel"><div class="label">${t('roundN',L.r)}</div>
+  <div class="headline">${L.w==null?t('tieRound'):esc(t('winsRound',view.seats[L.w].n))}</div>
+  ${flags.length?`<div class="small muted">${t('inPlay')}: ${esc(flags.join(' · '))}</div>`:''}
   <div class="reveal">${L.items.map((it,i)=>{
     const changed=it.held&&(it.f!==it.held[0]||it.v!==+it.held.slice(1)||it.held!==it.pp);
-    return `<div class="rv ${i===L.w?'win':''}"><div class="seat-name small">${esc(view.seats[i].n)}${i===mySeat()?' (tú)':''}</div>
-    ${it.held?`<div class="mini"><span class="big t${it.f}">${TYPES[it.f].i} ${it.v}</span></div>${changed?`<div class="was">Jugó ${fmt(it.pp)}${it.held!==it.pp?`, terminó con ${fmt(it.held)}`:''}</div>`:''}`:'<div class="was">Sin carta jugable: pierde la ronda</div>'}
+    return `<div class="rv ${i===L.w?'win':''}"><div class="seat-name small">${esc(view.seats[i].n)}${i===mySeat()?t('you'):''}</div>
+    ${it.held?`<div class="mini"><span class="big t${it.f}">${ICON[it.f]} ${it.v}</span></div>${changed?`<div class="was">${t('played',fmt(it.pp),it.held!==it.pp?fmt(it.held):'')}</div>`:''}`:`<div class="was">${t('noPlayable')}</div>`}
     ${it.pw.length?`<div class="pills">${it.pw.map(pill).join('')}</div>`:''}
-    ${multi&&it.held?`<div class="was">Gana a ${it.b}</div>`:''}</div>`}).join('')}</div></section>`;
+    ${multi&&it.held?`<div class="was">${t('beats',it.b)}</div>`:''}</div>`}).join('')}</div></section>`;
 }
 
 function gameHTML(){
   const me=mySeat();const hand=myHand();const over=view.ph==='over';
   const seats=`<div class="seats">${view.seats.map((s,i)=>`<div class="seat ${i===me?'me':''} ${over&&i===view.w?'won':''}">
-    <div class="seat-top"><span class="seat-name">${esc(s.n)}${i===me?' (tú)':''}${s.b?' <span class="muted small">bot</span>':''}</span>
-    <span class="status ${s.rd||s.b?'ok':'wait'}">${over?(i===view.w?'Ganador':''):s.b?'':s.rd?'Listo':'Eligiendo'}</span></div>
-    <div class="pts">${ptsHTML(s.pts)}</div><div class="small muted">${s.hc} cartas en mano</div></div>`).join('')}</div>`;
-  const tr=view.tr?`<div class="traps"><div class="label">Trampas activas · de ${esc(view.seats[view.tr.o].n)}</div><div class="pills">${view.tr.c.map(pill).join('')}</div><div class="small">${view.tr.c.map(c=>esc(desc(c,view.n))).join(' · ')}${view.tr.o===me?' (no te afecta el bloqueo)':''}</div></div>`:'';
-  const banner=over?`<div class="banner"><div class="headline">${esc(view.seats[view.w].n)} gana la partida</div>${mode==='host'?`<div class="row"><button class="btn" data-act="rematch">Revancha</button><button class="btn" data-act="tolobby">Volver a la sala</button></div>`:'<div>Esperando a que el host empiece otra partida.</div>'}</div>`:'';
-  const logH=view.log.length?`<section class="panel"><div class="label">Registro</div><ul class="log">${view.log.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></section>`:'';
+    <div class="seat-top"><span class="seat-name">${esc(s.n)}${i===me?t('you'):''}${s.b?` <span class="muted small">${t('botTag')}</span>`:''}</span>
+    <span class="status ${s.rd||s.b?'ok':'wait'}">${over?(i===view.w?t('winner'):''):s.b?'':s.rd?t('ready'):t('picking')}</span></div>
+    <div class="pts">${ptsHTML(s.pts)}</div><div class="small muted">${t('inHand',s.hc)}</div></div>`).join('')}</div>`;
+  const tr=view.tr?`<div class="traps"><div class="label">${esc(t('trapsFrom',view.seats[view.tr.o].n))}</div><div class="pills">${view.tr.c.map(pill).join('')}</div><div class="small">${view.tr.c.map(c=>esc(pdesc(c,view.n))).join(' · ')}${view.tr.o===me?t('notYou'):''}</div></div>`:'';
+  const banner=over?`<div class="banner"><div class="headline">${esc(t('winsGame',view.seats[view.w].n))}</div>${mode==='host'?`<div class="row"><button class="btn" data-act="rematch">${t('rematch')}</button><button class="btn" data-act="tolobby">${t('toLobby')}</button></div>`:`<div>${t('waitRematch')}</div>`}</div>`:'';
+  const logH=view.log.length?`<section class="panel"><div class="label">${t('log')}</div><ul class="log">${view.log.map(l=>`<li>${esc(Array.isArray(l)?logText(l):l)}</li>`).join('')}</ul></section>`:'';
   let handH='',bar='';
   if(me<0){
-    handH=`<section class="panel"><p class="muted">Estás mirando la partida. Entra en la siguiente desde el lobby.</p></section>`;
+    handH=`<section class="panel"><p class="muted">${t('spectate')}</p></section>`;
   }else if(!over){
     const excess=hand.length-8,needDc=excess-sel.dc.length;
     const blk=blockedFor(view.tr,me);
     const anyPlayable=hand.some(c=>canPlay(view.tr,me,c));
-    handH=`<section class="panel"><div class="row" style="justify-content:space-between"><div class="label">Tu mano · ${hand.length} cartas</div>${blk?`<span class="small err">Bloqueado: ${TYPES[blk].n.toLowerCase()}</span>`:''}</div>
+    handH=`<section class="panel"><div class="row" style="justify-content:space-between"><div class="label">${t('yourHand',hand.length)}</div>${blk?`<span class="small err">${t('blocked',T().typesLow[blk])}</span>`:''}</div>
       <div class="hand">${hand.map((c,i)=>cardHTML(c,i,[sel.pp===i||sel.pw.includes(i)?'on':'',sel.dc.includes(i)?'dc':'',isRPS(c)&&!canPlay(view.tr,me,c)?'blocked':''].join(' '))).join('')}</div>
       ${targetsHTML(hand,me)}</section>`;
-    let msg,btn;
+    let m,btn;
     if(mySub){
       const waiting=view.seats.filter((s,i)=>!s.b&&!s.rd&&i!==me).map(s=>s.n);
-      msg=`Enviado${mySub.pp?`: ${fmt(mySub.pp)}`:''}${mySub.pw.length?` + ${mySub.pw.map(fmt).join(', ')}`:''}. ${waiting.length?`Esperando a ${waiting.join(', ')}.`:'Resolviendo…'}`;
-      btn=`<button class="btn" data-act="unsubmit">Cambiar</button>`;
+      const cards=[mySub.pp?fmt(mySub.pp):'',...mySub.pw.map(fmt)].filter(Boolean).join(' + ');
+      m=t('sent',cards,waiting.join(', '));
+      btn=`<button class="btn" data-act="unsubmit">${t('change')}</button>`;
     }else if(needDc>0){
-      msg=`Tienes ${hand.length} cartas: toca ${needDc} para descartar.`;btn=`<button class="btn primary" disabled>Listo</button>`;
+      m=t('discardN',hand.length,needDc);btn=`<button class="btn primary" disabled>${t('readyBtn')}</button>`;
     }else if(!anyPlayable){
-      msg='No tienes ninguna carta PPoT jugable: pierdes la ronda.';btn=`<button class="btn primary" data-act="submit">Aceptar</button>`;
+      m=t('cantPlay');btn=`<button class="btn primary" data-act="submit">${t('accept')}</button>`;
     }else{
-      msg=sel.pp==null?'Elige 1 carta PPoT y hasta 3 powerups.':`${fmt(hand[sel.pp])}${sel.pw.length?' + '+sel.pw.map(i=>fmt(hand[i])).join(', '):''}`;
-      btn=`<button class="btn primary" data-act="submit" ${sel.pp==null?'disabled':''}>Listo</button>`;
+      m=sel.pp==null?t('pick'):`${fmt(hand[sel.pp])}${sel.pw.length?' + '+sel.pw.map(i=>fmt(hand[i])).join(', '):''}`;
+      btn=`<button class="btn primary" data-act="submit" ${sel.pp==null?'disabled':''}>${t('readyBtn')}</button>`;
     }
-    if(hint)msg=hint;
-    bar=`<div class="bar"><div class="bar-in"><div class="hint ${hint&&hintWarn?'warn':''}" aria-live="polite">${esc(msg)}</div>${btn}</div></div>`;
+    if(hint)m=msg(hint);
+    bar=`<div class="bar"><div class="bar-in"><div class="hint ${hint&&hintWarn?'warn':''}" aria-live="polite">${esc(m)}</div>${btn}</div></div>`;
   }
-  return `${banner}<section class="panel"><div class="label">Jugadores</div>${seats}${tr}</section>${lastHTML()}${handH}${logH}${rulesHTML()}${bar}`;
+  return `${banner}<section class="panel"><div class="label">${t('players')}</div>${seats}${tr}</section>${lastHTML()}${handH}${logH}${rulesHTML()}${bar}`;
 }
 function targetsHTML(hand,me){
   if(view.n<3||mySub)return '';
-  const t=sel.pw.map(i=>hand[i]).filter(c=>POW[c].tgt);
-  if(!t.length)return '';
+  const tc=sel.pw.map(i=>hand[i]).filter(c=>POW[c].tgt);
+  if(!tc.length)return '';
   const rivals=view.seats.map((s,i)=>({s,i})).filter(x=>x.i!==me);
-  return `<div class="targets">${t.map(c=>`<label class="row small"><span><strong>${esc(POW[c].t)}</strong>: si ganas, afecta a</span><select data-act="tg" data-c="${c}" id="tg-${c}">${rivals.map(x=>`<option value="${x.i}" ${sel.tg[c]===x.i?'selected':''}>${esc(x.s.n)}</option>`).join('')}</select></label>`).join('')}</div>`;
+  return `<div class="targets">${tc.map(c=>`<label class="row small"><span><strong>${esc(ptitle(c))}</strong>: ${t('targetLabel')}</span><select data-act="tg" data-c="${c}" id="tg-${c}">${rivals.map(x=>`<option value="${x.i}" ${sel.tg[c]===x.i?'selected':''}>${esc(x.s.n)}</option>`).join('')}</select></label>`).join('')}</div>`;
 }
 
-function render(force){
+function render(force,code){
+  const rulesOpen=!!(document.getElementById('rules')||{}).open;
   if(mode==='home'){
     if(!force&&document.getElementById('home'))return;
-    app.innerHTML=header()+homeHTML()+'<footer></footer>';return;
+    app.innerHTML=header()+homeHTML(code)+'<footer></footer>';
+  }else{
+    let body;
+    if(mode==='host'&&!G){
+      body=`<section class="panel"><div class="headline">${t('creating')}</div><p class="muted">${t('creatingSub')}</p></section>`;
+    }else if(mode==='guest'&&!view){
+      body=`<section class="panel"><div class="headline">${t('room')} ${esc(guestCode)}</div><p class="muted">${esc(msg(status))}</p></section>`;
+    }else if(mode==='guest'&&hostGone){
+      body=`<section class="panel"><div class="headline">${t('hostLost')}</div><p class="muted">${t('hostLostSub')}</p></section>`;
+    }else body=view.ph==='lobby'?lobbyHTML():gameHTML();
+    app.innerHTML=header()+body+'<footer></footer>';
   }
-  let body;
-  if(mode==='host'&&!G){
-    body=`<section class="panel"><div class="headline">Creando sala…</div><p class="muted">Conectando con el servidor de salas.</p></section>`;
-  }else if(mode==='guest'&&!view){
-    body=`<section class="panel"><div class="headline">Sala ${esc(guestCode)}</div><p class="muted">${esc(status)}</p></section>`;
-  }else if(mode==='guest'&&hostGone){
-    body=`<section class="panel"><div class="headline">Se perdió la conexión con el host</div><p class="muted">La partida vive en el navegador del host. Si cerró la pestaña, tendrá que crear otra sala y pasaros el código nuevo.</p></section>`;
-  }else body=view.ph==='lobby'?lobbyHTML():gameHTML();
-  app.innerHTML=header()+body+'<footer></footer>';
+  const r=document.getElementById('rules');if(r&&rulesOpen)r.open=true;
 }
 
 /* ------------------------------------------------------------------ events */
 app.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   const a=b.dataset.act;
-  if(a==='create')hostCreate(false);
+  if(a==='lang'){
+    lang=lang==='es'?'en':'es';document.documentElement.lang=lang;
+    try{localStorage.setItem('coc-lang',lang)}catch(e){}
+    const codeEl=document.getElementById('code');saveName();
+    render(true,codeEl?codeEl.value:'');
+  }
+  else if(a==='create')hostCreate(false);
   else if(a==='solo')hostCreate(true);
   else if(a==='join')guestJoin();
   else if(a==='leave')leave();
