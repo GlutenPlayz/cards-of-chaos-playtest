@@ -173,6 +173,20 @@ footer{padding-bottom:24px}
 .cyc-v{font-weight:700;color:var(--ink)}
 .cb{font-size:11px;text-align:center;color:var(--muted);white-space:nowrap}
 .arena .cycle{justify-content:center}
+.guide{display:flex;flex-direction:column;gap:6px}
+.goal{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:13px;color:var(--muted)}
+.goal.big{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px}
+.goal-opt{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.goal-ic{font-size:18px;letter-spacing:1px}
+.goal.big .goal-ic{font-size:22px}
+.goal-or{font-style:italic}
+.prog{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
+.prow{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.prow b{color:var(--ink);font-variant-numeric:tabular-nums}
+.pbar{display:inline-flex;gap:2px}
+.pbar i{display:block;width:10px;height:6px;border-radius:2px;background:var(--line)}
+.pbar i.on{background:var(--good)}
+.matchpt{font-size:12px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:2px 8px;align-self:flex-start}
 .capwarn{border:2px solid var(--S);color:var(--S);border-radius:10px;padding:8px 12px;font-weight:700}
 </style>
 
@@ -247,7 +261,7 @@ es:{
   handCap:h=>`Tu mano · ${h}/8 cartas`,
   capWarn:(h,n)=>`Tienes ${h} cartas y el máximo es 8. Toca ${n===1?'1 carta':n+' cartas'} para descartar antes de jugar.`,
   animSkip:'Saltar',animWin:'¡Gana!',animTie:'Empate',animNoCard:'Sin carta',animCards:n=>`−${n} cartas`,
-  animOn:'Animación: sí',animOff:'Animación: no',pickTarget:'Elige objetivo',confirm:'Confirmar',waitTarget:n=>`Esperando a que ${n} elija objetivo…`,statusTarget:'Elige objetivo',
+  goalLbl:'Para ganar',goalSame:'3 iguales',goalMix:'1 de cada',goalOr:'o',progSame:'Iguales',progMix:'Uno de cada',matchPt:l=>`¡A 1 punto! Gana con ${l}`,orWord:'o',animOn:'Animación: sí',animOff:'Animación: no',pickTarget:'Elige objetivo',confirm:'Confirmar',waitTarget:n=>`Esperando a que ${n} elija objetivo…`,statusTarget:'Elige objetivo',
   beatsNames:l=>l?`Gana a: ${l}`:'No gana a nadie',beatsWord:'gana a',reversedTag:'invertido',
   animTieBreak:(n,low)=>`Empate con ${n} ${n===1?'victoria':'victorias'}: gana el número ${low?'más bajo':'más alto'}`,
   animTrap:'¡Trampa lista!',animDuel:'solo números',animInvCancel:'Invertido ×2: se cancela',trapWord:'Trampa',
@@ -323,7 +337,7 @@ en:{
   handCap:h=>`Your hand · ${h}/8 cards`,
   capWarn:(h,n)=>`You have ${h} cards and the max is 8. Tap ${n===1?'1 card':n+' cards'} to discard before you play.`,
   animSkip:'Skip',animWin:'Wins!',animTie:'Tie',animNoCard:'No card',animCards:n=>`−${n} cards`,
-  animOn:'Animation: on',animOff:'Animation: off',pickTarget:'Choose a target',confirm:'Confirm',waitTarget:n=>`Waiting for ${n} to choose a target…`,statusTarget:'Choosing target',
+  goalLbl:'To win',goalSame:'3 of a kind',goalMix:'1 of each',goalOr:'or',progSame:'Same',progMix:'One of each',matchPt:l=>`1 point away! Wins with ${l}`,orWord:'or',animOn:'Animation: on',animOff:'Animation: off',pickTarget:'Choose a target',confirm:'Confirm',waitTarget:n=>`Waiting for ${n} to choose a target…`,statusTarget:'Choosing target',
   beatsNames:l=>l?`Beats: ${l}`:'Beats nobody',beatsWord:'beats',reversedTag:'reversed',
   animTieBreak:(n,low)=>`Tied at ${n} ${n===1?'win':'wins'}: the ${low?'lowest':'highest'} number wins`,
   animTrap:'Trap set!',animDuel:'numbers only',animInvCancel:'Reversed ×2: cancels out',trapWord:'Trap',
@@ -692,6 +706,21 @@ function cycleHTML(big){
   const seg=(a,b)=>`<span class="cyc-step"><span class="cyc-ic">${ICON[a]}</span><span class="cyc-v">${V[a]}</span><span class="cyc-ic">${ICON[b]}</span></span>`;
   return `<div class="cycle${big?' big':''}" role="note" aria-label="${t('cycleLbl')}: ${N.P} ${V.P} ${N.R}, ${N.R} ${V.R} ${N.S}, ${N.S} ${V.S} ${N.P}"><span class="cyc-lbl">${t('cycleLbl')}</span>${seg('P','R')}${seg('R','S')}${seg('S','P')}</div>`;
 }
+function goalHTML(big){
+  return `<div class="goal${big?' big':''}" role="note"><span class="cyc-lbl">${t('goalLbl')}</span>
+  <span class="goal-opt"><span class="goal-ic">${ICON.R}${ICON.R}${ICON.R}</span><span class="cyc-v">${t('goalSame')}</span></span>
+  <span class="goal-or">${t('goalOr')}</span>
+  <span class="goal-opt"><span class="goal-ic">${ICON.R}${ICON.P}${ICON.S}</span><span class="cyc-v">${t('goalMix')}</span></span></div>`;
+}
+function progressHTML(pts){
+  const c={R:0,P:0,S:0};pts.forEach(x=>c[x[0]]++);
+  const same=Math.max(c.R,c.P,c.S),mix=['R','P','S'].filter(k=>c[k]).length;
+  const need=new Set();['R','P','S'].forEach(k=>{if(c[k]===2)need.add(k)});
+  if(mix===2)['R','P','S'].forEach(k=>{if(!c[k])need.add(k)});
+  const bar=n=>`<span class="pbar" aria-hidden="true">${[0,1,2].map(i=>`<i class="${i<n?'on':''}"></i>`).join('')}</span>`;
+  return `<div class="prog"><span class="prow">${t('progSame')} ${bar(same)} <b>${same}/3</b></span><span class="prow">${t('progMix')} ${bar(mix)} <b>${mix}/3</b></span></div>
+  ${need.size?`<div class="matchpt">${esc(t('matchPt',[...need].map(k=>ICON[k]).join(' '+t('orWord')+' ')))}</div>`:''}`;
+}
 function header(){
   const chips=[];
   if(view&&mode!=='home'){
@@ -749,7 +778,7 @@ function gameHTML(){
   const seats=`<div class="seats">${view.seats.map((s,i)=>`<div class="seat ${i===me?'me':''} ${over&&i===view.w?'won':''}">
     <div class="seat-top"><span class="seat-name">${esc(s.n)}${i===me?t('you'):''}${s.b?` <span class="muted small">${t('botTag')}</span>`:''}</span>
     <span class="status ${s.rd||s.b?'ok':'wait'}">${over?(i===view.w?t('winner'):''):view.ph==='target'?(view.pend&&i===view.pend.w?t('statusTarget'):''):s.b?'':s.rd?t('ready'):t('picking')}</span></div>
-    <div class="pts">${ptsHTML(s.pts)}</div><div class="small muted">${t('inHand',s.hc)}</div></div>`).join('')}</div>`;
+    <div class="pts">${ptsHTML(s.pts)}</div>${progressHTML(s.pts)}<div class="small muted">${t('inHand',s.hc)}</div></div>`).join('')}</div>`;
   const tr=view.tr?`<div class="traps"><div class="label">${esc(t('trapsFrom',view.seats[view.tr.o].n))}</div><div class="pills">${view.tr.c.map(pill).join('')}</div><div class="small">${view.tr.c.map(c=>esc(pdesc(c,view.n))).join(' · ')}${view.tr.o===me?t('notYou'):''}</div></div>`:'';
   const banner=over?`<div class="banner"><div class="headline">${esc(t('winsGame',view.seats[view.w].n))}</div>${mode==='host'?`<div class="row"><button class="btn" data-act="rematch">${t('rematch')}</button><button class="btn" data-act="tolobby">${t('toLobby')}</button></div>`:`<div>${t('waitRematch')}</div>`}</div>`:'';
   const logH=view.log.length?`<section class="panel"><div class="label">${t('log')}</div><ul class="log">${view.log.map(l=>`<li>${esc(Array.isArray(l)?logText(l):l)}</li>`).join('')}</ul></section>`:'';
@@ -806,7 +835,7 @@ function render(force,code){
   const rulesOpen=!!(document.getElementById('rules')||{}).open;
   if(mode==='home'){
     if(!force&&document.getElementById('home'))return;
-    app.innerHTML=header()+cycleHTML(true)+homeHTML(code)+'<footer></footer>';
+    app.innerHTML=header()+cycleHTML(true)+goalHTML(true)+homeHTML(code)+'<footer></footer>';
   }else{
     let body;
     if(mode==='host'&&!G){
@@ -816,7 +845,7 @@ function render(force,code){
     }else if(mode==='guest'&&hostGone){
       body=`<section class="panel"><div class="headline">${t('hostLost')}</div><p class="muted">${t('hostLostSub')}</p></section>`;
     }else body=view.ph==='lobby'?lobbyHTML():gameHTML();
-    app.innerHTML=header()+cycleHTML(false)+body+'<footer></footer>';
+    app.innerHTML=header()+`<div class="guide">${cycleHTML(false)}${goalHTML(false)}</div>`+body+'<footer></footer>';
   }
   const r=document.getElementById('rules');if(r&&rulesOpen)r.open=true;
   maybeAnimate();
