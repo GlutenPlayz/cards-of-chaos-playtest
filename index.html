@@ -247,7 +247,7 @@ es:{
   handCap:h=>`Tu mano · ${h}/8 cartas`,
   capWarn:(h,n)=>`Tienes ${h} cartas y el máximo es 8. Toca ${n===1?'1 carta':n+' cartas'} para descartar antes de jugar.`,
   animSkip:'Saltar',animWin:'¡Gana!',animTie:'Empate',animNoCard:'Sin carta',animCards:n=>`−${n} cartas`,
-  pickTarget:'Elige objetivo',confirm:'Confirmar',waitTarget:n=>`Esperando a que ${n} elija objetivo…`,statusTarget:'Elige objetivo',
+  animOn:'Animación: sí',animOff:'Animación: no',pickTarget:'Elige objetivo',confirm:'Confirmar',waitTarget:n=>`Esperando a que ${n} elija objetivo…`,statusTarget:'Elige objetivo',
   beatsNames:l=>l?`Gana a: ${l}`:'No gana a nadie',beatsWord:'gana a',reversedTag:'invertido',
   animTieBreak:(n,low)=>`Empate con ${n} ${n===1?'victoria':'victorias'}: gana el número ${low?'más bajo':'más alto'}`,
   animTrap:'¡Trampa lista!',animDuel:'solo números',animInvCancel:'Invertido ×2: se cancela',trapWord:'Trampa',
@@ -323,7 +323,7 @@ en:{
   handCap:h=>`Your hand · ${h}/8 cards`,
   capWarn:(h,n)=>`You have ${h} cards and the max is 8. Tap ${n===1?'1 card':n+' cards'} to discard before you play.`,
   animSkip:'Skip',animWin:'Wins!',animTie:'Tie',animNoCard:'No card',animCards:n=>`−${n} cards`,
-  pickTarget:'Choose a target',confirm:'Confirm',waitTarget:n=>`Waiting for ${n} to choose a target…`,statusTarget:'Choosing target',
+  animOn:'Animation: on',animOff:'Animation: off',pickTarget:'Choose a target',confirm:'Confirm',waitTarget:n=>`Waiting for ${n} to choose a target…`,statusTarget:'Choosing target',
   beatsNames:l=>l?`Beats: ${l}`:'Beats nobody',beatsWord:'beats',reversedTag:'reversed',
   animTieBreak:(n,low)=>`Tied at ${n} ${n===1?'win':'wins'}: the ${low?'lowest':'highest'} number wins`,
   animTrap:'Trap set!',animDuel:'numbers only',animInvCancel:'Reversed ×2: cancels out',trapWord:'Trap',
@@ -698,7 +698,7 @@ function header(){
     chips.push(`<span class="chip">${t('room')} <strong>${esc(view.code)}</strong></span>`);
     if(view.ph!=='lobby')chips.push(`<span class="chip">${t('round')} <strong>${view.r}</strong></span>`,`<span class="chip">${t('deck')} <strong>${view.dk}</strong></span>`);
   }
-  return `<div class="topbar"><h1 class="brand">Cards of <b>Chaos</b></h1><div class="meta">${chips.join('')}<button class="btn sm" data-act="lang" aria-label="${t('langAria')}">${t('langBtn')}</button>${mode!=='home'?`<button class="btn sm" data-act="leave">${t('leave')}</button>`:''}</div></div>`;
+  return `<div class="topbar"><h1 class="brand">Cards of <b>Chaos</b></h1><div class="meta">${chips.join('')}<button class="btn sm" data-act="anim" aria-pressed="${animOn}">${animOn?t('animOn'):t('animOff')}</button><button class="btn sm" data-act="lang" aria-label="${t('langAria')}">${t('langBtn')}</button>${mode!=='home'?`<button class="btn sm" data-act="leave">${t('leave')}</button>`:''}</div></div>`;
 }
 function rulesHTML(){
   return `<details class="rules" id="rules"><summary>${t('rulesTitle')}</summary><ul>${T().rules.map(r=>`<li>${r}</li>`).join('')}</ul></details>`;
@@ -825,6 +825,8 @@ function render(force,code){
 
 /* ------------------------------------------------------------------ round replay (Super Auto Pets style) */
 let animKey='',animInit=false,arenaCtl=null;
+let animOn=true;
+try{const v=localStorage.getItem('coc-anim');animOn=v==null?true:v==='1'}catch(e){}
 const arena=document.getElementById('arena');
 const U=360;
 function maybeAnimate(){
@@ -836,7 +838,7 @@ function maybeAnimate(){
   animKey=key;
   if(!L.steps)return;
   if(sameRound&&!L.after)return;
-  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(!animOn)return;
   playRound(L,view.seats.map(s=>s.n),mySeat(),view.n,sameRound?'after':'full');
 }
 function closeArena(){if(arenaCtl)arenaCtl.abort=true;arenaCtl=null;arena.hidden=true;arena.innerHTML=''}
@@ -989,6 +991,11 @@ app.addEventListener('click',e=>{
     try{localStorage.setItem('coc-lang',lang)}catch(e){}
     const codeEl=document.getElementById('code');saveName();
     render(true,codeEl?codeEl.value:'');
+  }
+  else if(a==='anim'){
+    animOn=!animOn;try{localStorage.setItem('coc-anim',animOn?'1':'0')}catch(e){}
+    if(!animOn)closeArena();
+    const codeEl=document.getElementById('code');saveName();render(true,codeEl?codeEl.value:'');
   }
   else if(a==='create')hostCreate(false);
   else if(a==='solo')hostCreate(true);
