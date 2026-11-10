@@ -376,7 +376,7 @@ const rnd=n=>Math.floor(Math.random()*n);
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function cleanName(s){return String(s||'').replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯﻿]/g,'').trim().slice(0,16)||'Player'}
-function buildDeck(){const d=[];for(const t of 'RPS')for(let v=1;v<=10;v++){d.push(t+v,t+v)}return d.concat(Object.keys(POW))}
+function buildDeck(){const d=[];for(const t of 'RPS')for(let v=1;v<=10;v++){d.push(t+v,t+v)}const pw=Object.keys(POW);return d.concat(pw,pw)}
 
 /* ------------------------------------------------------------------ engine (host only); log lines are stored as keys so each player reads them in their own language */
 function log(G,...e){G.log.push(e);if(G.log.length>30)G.log.shift()}
@@ -788,7 +788,7 @@ function gameHTML(){
   }else if(view.ph==='target'&&view.pend){
     const P=view.pend;
     if(me===P.w){
-      handH=`<section class="panel"><div class="headline">${t('pickTarget')}</div>${P.tcs.map(c=>`<div class="stack"><div class="small"><strong>${esc(ptitle(c))}</strong> · ${esc(pdesc(c,view.n))}</div>
+      handH=`<section class="panel"><div class="headline">${t('pickTarget')}</div>${[...new Set(P.tcs)].map(c=>`<div class="stack"><div class="small"><strong>${esc(ptitle(c))}</strong> · ${esc(pdesc(c,view.n))}</div>
         <div class="row">${view.seats.map((s,i)=>i===me?'':`<button class="btn tgtbtn ${tsel[c]===i?'on':''}" data-act="tgpick" data-c="${c}" data-i="${i}" aria-pressed="${tsel[c]===i}" ${tSent?'disabled':''}><span>${esc(s.n)}</span><span class="pts">${ptsHTML(s.pts)}</span></button>`).join('')}</div></div>`).join('')}</section>`;
       const ok=P.tcs.every(c=>Number.isInteger(tsel[c]));
       bar=`<div class="bar"><div class="bar-in"><div class="hint ${hint&&hintWarn?'warn':''}" aria-live="polite">${esc(hint?msg(hint):t('pickTarget'))}</div><button class="btn primary" data-act="tgconfirm" ${ok&&!tSent?'':'disabled'}>${t('confirm')}</button></div></div>`;
