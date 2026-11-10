@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cards of Chaos Mesa</title>
+<title>Cards of Chaos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
@@ -164,6 +164,15 @@ footer{padding-bottom:24px}
 .lane.afade{opacity:.28}
 .tgtbtn{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tgtbtn.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.cycle{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:13px;color:var(--muted)}
+.cycle.big{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px}
+.cyc-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.cyc-step{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.cyc-ic{font-size:20px;line-height:1}
+.cycle.big .cyc-ic{font-size:24px}
+.cyc-v{font-weight:700;color:var(--ink)}
+.cb{font-size:11px;text-align:center;color:var(--muted);white-space:nowrap}
+.arena .cycle{justify-content:center}
 .capwarn{border:2px solid var(--S);color:var(--S);border-radius:10px;padding:8px 12px;font-weight:700}
 </style>
 
@@ -177,32 +186,33 @@ footer{padding-bottom:24px}
 /* ------------------------------------------------------------------ text (ES / EN) */
 const TXT={
 es:{
-  types:{R:'Piedra',P:'Papel',S:'Tijeras'},typesLow:{R:'piedra',P:'papel',S:'tijeras'},
+  types:{R:'Conejo',P:'Chistera',S:'Varita'},typesLow:{R:'conejo',P:'chistera',S:'varita'},
+  verb:{P:'atrapa',R:'muerde',S:'hechiza'},cycleLbl:'Ciclo',cardBeats:'gana a',
   kind:{inst:'Hechizo · esta ronda',vic:'Victoria · si ganas',trap:'Trampa · próxima ronda'},
   pow:{
-    plus:['+3','+3 a tu carta PPoT'],
-    minus:['−3','−3 a la carta PPoT del rival','−3 a la carta PPoT de todos los rivales'],
+    plus:['+3','+3 a tu carta de Truco'],
+    minus:['−3','−3 a la carta de Truco del rival','−3 a la carta de Truco de todos los rivales'],
     duelo:['Duelo','Solo importan los números'],
-    inv:['Invertido','Piedra, papel o tijeras invertido'],
-    swap:['Intercambio','Se intercambian las cartas PPoT jugadas','Todos pasan su carta PPoT a la izquierda'],
-    remR:['Quitar ✊','Remueve un punto de piedra del rival'],
-    remP:['Quitar ✋','Remueve un punto de papel del rival'],
-    remS:['Quitar ✌️','Remueve un punto de tijeras del rival'],
+    inv:['Invertido','El ciclo se invierte esta ronda'],
+    swap:['Intercambio','Se intercambian las cartas de Truco jugadas','Todos pasan su carta de Truco a la izquierda'],
+    remR:['Quitar 🐰','Remueve un punto de conejo del rival'],
+    remP:['Quitar 🎩','Remueve un punto de chistera del rival'],
+    remS:['Quitar 🪄','Remueve un punto de varita del rival'],
     disc:['Descarte','El rival descarta 3 cartas a ciegas'],
-    noR:['Sin ✊','El rival no puede jugar piedra','Los rivales no pueden jugar piedra'],
-    noP:['Sin ✋','El rival no puede jugar papel','Los rivales no pueden jugar papel'],
-    noS:['Sin ✌️','El rival no puede jugar tijeras','Los rivales no pueden jugar tijeras'],
-    tRP:['✊ → ✋','Transformar piedra a papel'],
-    tPS:['✋ → ✌️','Transformar papel a tijeras'],
-    tSR:['✌️ → ✊','Transformar tijeras a piedra'],
+    noR:['Sin 🐰','El rival no puede jugar conejo','Los rivales no pueden jugar conejo'],
+    noP:['Sin 🎩','El rival no puede jugar chistera','Los rivales no pueden jugar chistera'],
+    noS:['Sin 🪄','El rival no puede jugar varita','Los rivales no pueden jugar varita'],
+    tRP:['🐰 → 🎩','Transformar conejo en chistera'],
+    tPS:['🎩 → 🪄','Transformar chistera en varita'],
+    tSR:['🪄 → 🐰','Transformar varita en conejo'],
     low:['Bajo gana','Gana el número más bajo']
   },
   langBtn:'EN',langAria:'Switch to English',
   room:'Sala',round:'Ronda',deck:'Mazo',leave:'Salir',
   rulesTitle:'Reglas rápidas',
-  rules:['Cada uno elige <strong>1 carta PPoT y 0-3 powerups</strong> boca abajo; se revelan a la vez.',
-    'Piedra gana a tijeras, tijeras a papel, papel a piedra. Mismo tipo: gana el número más alto. Mismo número: nadie gana.',
-    'El ganador guarda su carta PPoT como punto. Gana la partida: <strong>3 del mismo tipo</strong> o <strong>1 de cada tipo</strong>.',
+  rules:['Cada uno elige <strong>1 carta de Truco y 0-3 powerups</strong> boca abajo; se revelan a la vez.',
+    'La chistera atrapa al conejo, el conejo muerde la varita y la varita hechiza la chistera. Mismo tipo: gana el número más alto. Mismo número: nadie gana.',
+    'El ganador guarda su carta de Truco como punto. Gana la partida: <strong>3 del mismo tipo</strong> o <strong>1 de cada tipo</strong>.',
     'Robo: ganador 1, perdedor 3 (multijugador: 2). Empate: todos 2. Máximo 8 cartas en mano.',
     'Multijugador: gana el que le gane a más cartas; si empatan, gana el número más alto.'],
   rulesNote:'En este prototipo, el objetivo de las cartas Victoria se elige al jugarlas.',
@@ -230,7 +240,7 @@ es:{
   yourHand:n=>`Tu mano · ${n} cartas`,blocked:t=>`Bloqueado: ${t}`,blockedTag:'Bloqueada',
   sent:(c,w)=>`Enviado${c?': '+c:''}. ${w?`Esperando a ${w}.`:'Resolviendo…'}`,change:'Cambiar',
   discardN:(h,n)=>`Tienes ${h} cartas: toca ${n} para descartar.`,readyBtn:'Listo',accept:'Aceptar',
-  cantPlay:'No tienes ninguna carta PPoT jugable: pierdes la ronda.',pick:'Elige 1 carta PPoT y hasta 3 powerups.',
+  cantPlay:'No tienes ninguna carta de Truco jugable: pierdes la ronda.',pick:'Elige 1 carta de Truco y hasta 3 powerups.',
   targetLabel:'si ganas, afecta a',
   hBlocked:'Esa carta está bloqueada esta ronda.',hMax3:'Máximo 3 powerups por ronda.',hBlk1:'Máximo 1 carta de bloqueo.',
   hSendFail:'No se pudo enviar. Revisa la conexión.',
@@ -243,7 +253,7 @@ es:{
   animTrap:'¡Trampa lista!',animDuel:'solo números',animInvCancel:'Invertido ×2: se cancela',trapWord:'Trampa',
   L:{
     start:()=>'Empieza la partida',shuffle:()=>'Se baraja la pila de descarte',
-    noRPS:n=>`${n} no tenía cartas PPoT: descarta su mano y roba 7`,
+    noRPS:n=>`${n} no tenía cartas de Truco: descarta su mano y roba 7`,
     tie:r=>`Ronda ${r}: empate, nadie gana`,win:(r,n,c)=>`Ronda ${r}: ${n} gana con ${c}`,
     disc:(n,k)=>`${n} descarta ${k} cartas a ciegas`,
     rem:(n,t,x)=>`${n} quita un punto de ${t} a ${x}`,remNone:(x,t)=>`${x} no tenía puntos de ${t}`,
@@ -252,32 +262,33 @@ es:{
   }
 },
 en:{
-  types:{R:'Rock',P:'Paper',S:'Scissors'},typesLow:{R:'rock',P:'paper',S:'scissors'},
+  types:{R:'Rabbit',P:'Top Hat',S:'Wand'},typesLow:{R:'rabbit',P:'top hat',S:'wand'},
+  verb:{P:'traps',R:'chews',S:'enchants'},cycleLbl:'Cycle',cardBeats:'beats',
   kind:{inst:'Spell · this round',vic:'Victory · if you win',trap:'Trap · next round'},
   pow:{
-    plus:['+3','+3 to your RPS card'],
-    minus:['−3','−3 to the rival’s RPS card','−3 to every rival’s RPS card'],
+    plus:['+3','+3 to your Trick card'],
+    minus:['−3','−3 to the rival’s Trick card','−3 to every rival’s Trick card'],
     duelo:['Duel','Only the numbers matter'],
-    inv:['Reversed','Rock, paper, scissors reversed'],
-    swap:['Swap','The played RPS cards are swapped','Everyone passes their RPS card to the left'],
-    remR:['Remove ✊','Remove one rock point from the rival'],
-    remP:['Remove ✋','Remove one paper point from the rival'],
-    remS:['Remove ✌️','Remove one scissors point from the rival'],
+    inv:['Reversed','The cycle is reversed this round'],
+    swap:['Swap','The played Trick cards are swapped','Everyone passes their Trick card to the left'],
+    remR:['Remove 🐰','Remove one rabbit point from the rival'],
+    remP:['Remove 🎩','Remove one top hat point from the rival'],
+    remS:['Remove 🪄','Remove one wand point from the rival'],
     disc:['Discard','The rival discards 3 cards at random'],
-    noR:['No ✊','The rival can’t play rock','Rivals can’t play rock'],
-    noP:['No ✋','The rival can’t play paper','Rivals can’t play paper'],
-    noS:['No ✌️','The rival can’t play scissors','Rivals can’t play scissors'],
-    tRP:['✊ → ✋','Turn rock into paper'],
-    tPS:['✋ → ✌️','Turn paper into scissors'],
-    tSR:['✌️ → ✊','Turn scissors into rock'],
+    noR:['No 🐰','The rival can’t play rabbit','Rivals can’t play rabbit'],
+    noP:['No 🎩','The rival can’t play top hat','Rivals can’t play top hat'],
+    noS:['No 🪄','The rival can’t play wand','Rivals can’t play wand'],
+    tRP:['🐰 → 🎩','Turn rabbit into top hat'],
+    tPS:['🎩 → 🪄','Turn top hat into wand'],
+    tSR:['🪄 → 🐰','Turn wand into rabbit'],
     low:['Low wins','The lowest number wins']
   },
   langBtn:'ES',langAria:'Cambiar a español',
   room:'Room',round:'Round',deck:'Deck',leave:'Leave',
   rulesTitle:'Quick rules',
-  rules:['Everyone picks <strong>1 RPS card and 0-3 power-ups</strong> face down; they’re revealed at the same time.',
-    'Rock beats scissors, scissors beat paper, paper beats rock. Same type: the higher number wins. Same number: nobody wins.',
-    'The winner keeps their RPS card as a point. Win the game with <strong>3 of the same type</strong> or <strong>1 of each type</strong>.',
+  rules:['Everyone picks <strong>1 Trick card and 0-3 power-ups</strong> face down; they’re revealed at the same time.',
+    'The top hat traps the rabbit, the rabbit chews the wand, and the wand enchants the top hat. Same type: the higher number wins. Same number: nobody wins.',
+    'The winner keeps their Trick card as a point. Win the game with <strong>3 of the same type</strong> or <strong>1 of each type</strong>.',
     'Draws: winner 1, loser 3 (multiplayer: 2). Tie: everyone 2. Max 8 cards in hand.',
     'Multiplayer: whoever beats the most cards wins; on a tie, the highest number wins.'],
   rulesNote:'In this prototype, Victory card targets are chosen when you play them.',
@@ -305,7 +316,7 @@ en:{
   yourHand:n=>`Your hand · ${n} cards`,blocked:t=>`Blocked: ${t}`,blockedTag:'Blocked',
   sent:(c,w)=>`Sent${c?': '+c:''}. ${w?`Waiting for ${w}.`:'Resolving…'}`,change:'Change',
   discardN:(h,n)=>`You have ${h} cards: tap ${n} to discard.`,readyBtn:'Ready',accept:'OK',
-  cantPlay:'You have no playable RPS card: you lose the round.',pick:'Pick 1 RPS card and up to 3 power-ups.',
+  cantPlay:'You have no playable Trick card: you lose the round.',pick:'Pick 1 Trick card and up to 3 power-ups.',
   targetLabel:'if you win, it hits',
   hBlocked:'That card is blocked this round.',hMax3:'Max 3 power-ups per round.',hBlk1:'Max 1 block card.',
   hSendFail:'Couldn’t send. Check your connection.',
@@ -318,7 +329,7 @@ en:{
   animTrap:'Trap set!',animDuel:'numbers only',animInvCancel:'Reversed ×2: cancels out',trapWord:'Trap',
   L:{
     start:()=>'The game starts',shuffle:()=>'The discard pile is shuffled',
-    noRPS:n=>`${n} had no RPS cards: discards their hand and draws 7`,
+    noRPS:n=>`${n} had no Trick cards: discards their hand and draws 7`,
     tie:r=>`Round ${r}: tie, nobody wins`,win:(r,n,c)=>`Round ${r}: ${n} wins with ${c}`,
     disc:(n,k)=>`${n} discards ${k} cards at random`,
     rem:(n,t,x)=>`${n} removes a ${t} point from ${x}`,remNone:(x,t)=>`${x} had no ${t} points`,
@@ -335,7 +346,7 @@ function t(k,...a){const v=T()[k];return typeof v==='function'?v(...a):v}
 const msg=x=>Array.isArray(x)?t(...x):(x||'');
 
 /* ------------------------------------------------------------------ data */
-const ICON={R:'✊',P:'✋',S:'✌️'};
+const ICON={R:'🐰',P:'🎩',S:'🪄'};
 const BEATS={R:'S',S:'P',P:'R'};
 const POW={
   plus:{k:'inst'},minus:{k:'inst',m:1},duelo:{k:'inst'},inv:{k:'inst'},swap:{k:'inst',m:1},
@@ -414,7 +425,7 @@ function resolve(G,subs){
   const steps=[];
   if(Object.keys(tf).length)steps.push({k:'tf',m:tf});
   if(low)steps.push({k:'low'});
-  // Swap: only the RPS cards move, power cards stay with their owner
+  // Swap: only the Trick cards move, power cards stay with their owner
   const swaps=P.reduce((a,p)=>a+p.pw.filter(c=>c==='swap').length,0);
   const act=cards.map((c,i)=>c?i:-1).filter(i=>i>=0);
   if(swaps&&act.length>=2){
@@ -670,12 +681,17 @@ function unsubmit(){
 /* ------------------------------------------------------------------ render */
 const app=document.getElementById('app');
 function cardHTML(c,i,cls){
-  if(isRPS(c)){const ty=c[0];return `<button class="card t${ty} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}" aria-label="${T().types[ty]} ${c.slice(1)}"><span class="cv">${c.slice(1)}</span><span class="ci" aria-hidden="true">${ICON[ty]}</span><span class="cn">${T().types[ty]}</span>${cls.includes('blocked')?`<span class="tag">${t('blockedTag')}</span>`:''}</button>`}
+  if(isRPS(c)){const ty=c[0];return `<button class="card t${ty} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}" aria-label="${T().types[ty]} ${c.slice(1)}"><span class="cv">${c.slice(1)}</span><span class="ci" aria-hidden="true">${ICON[ty]}</span><span class="cn">${T().types[ty]}</span><span class="cb">${t('cardBeats')} ${ICON[BEATS[ty]]}</span>${cls.includes('blocked')?`<span class="tag">${t('blockedTag')}</span>`:''}</button>`}
   const p=POW[c];return `<button class="card k${p.k} ${cls}" data-act="card" data-i="${i}" aria-pressed="${cls.includes('on')}"><span class="kind">${T().kind[p.k]}</span><span class="ptitle">${esc(ptitle(c))}</span><span class="pdesc">${esc(pdesc(c,view.n))}</span></button>`;
 }
 const pill=c=>`<span class="pill k${POW[c].k}">${esc(ptitle(c))}</span>`;
 function ptsHTML(pts){return pts.length?pts.map(c=>`<span class="pt t${c[0]}">${ICON[c[0]]} ${c.slice(1)}</span>`).join(''):`<span class="pt empty small">${t('noPts')}</span>`}
 
+function cycleHTML(big){
+  const V=T().verb,N=T().types;
+  const seg=(a,b)=>`<span class="cyc-step"><span class="cyc-ic">${ICON[a]}</span><span class="cyc-v">${V[a]}</span><span class="cyc-ic">${ICON[b]}</span></span>`;
+  return `<div class="cycle${big?' big':''}" role="note" aria-label="${t('cycleLbl')}: ${N.P} ${V.P} ${N.R}, ${N.R} ${V.R} ${N.S}, ${N.S} ${V.S} ${N.P}"><span class="cyc-lbl">${t('cycleLbl')}</span>${seg('P','R')}${seg('R','S')}${seg('S','P')}</div>`;
+}
 function header(){
   const chips=[];
   if(view&&mode!=='home'){
@@ -790,7 +806,7 @@ function render(force,code){
   const rulesOpen=!!(document.getElementById('rules')||{}).open;
   if(mode==='home'){
     if(!force&&document.getElementById('home'))return;
-    app.innerHTML=header()+homeHTML(code)+'<footer></footer>';
+    app.innerHTML=header()+cycleHTML(true)+homeHTML(code)+'<footer></footer>';
   }else{
     let body;
     if(mode==='host'&&!G){
@@ -800,7 +816,7 @@ function render(force,code){
     }else if(mode==='guest'&&hostGone){
       body=`<section class="panel"><div class="headline">${t('hostLost')}</div><p class="muted">${t('hostLostSub')}</p></section>`;
     }else body=view.ph==='lobby'?lobbyHTML():gameHTML();
-    app.innerHTML=header()+body+'<footer></footer>';
+    app.innerHTML=header()+cycleHTML(false)+body+'<footer></footer>';
   }
   const r=document.getElementById('rules');if(r&&rulesOpen)r.open=true;
   maybeAnimate();
@@ -832,6 +848,7 @@ async function playRound(L,names,me,n,part){
   const items=L.items;
   arena.innerHTML=`<div class="arena-in" role="dialog" aria-label="${esc(t('roundN',L.r))}">
    <div class="arena-top"><span class="label">${esc(t('roundN',L.r))}</span><button class="btn sm" id="skip">${t('animSkip')}</button></div>
+   ${cycleHTML(false)}
    <div class="abanner" id="abanner"></div>
    <div class="lanes" style="--n:${items.length}">${items.map((it,i)=>`<div class="lane">
      <div class="lane-name">${esc(names[i])}${i===me?t('you'):''}</div>
@@ -922,7 +939,7 @@ async function playRound(L,names,me,n,part){
         if(iw||jw){
           const a=iw?i:j,b=iw?j:i,ca=cs[a],cb=cs[b];
           const byNum=L.flags.duelo||ca.t===cb.t;
-          banner(byNum?`${ICON[ca.t]}${ca.v} ${L.flags.low?'<':'>'} ${ICON[cb.t]}${cb.v}`:`${ICON[ca.t]} ${t('beatsWord')} ${ICON[cb.t]}${L.flags.inv?' ('+t('reversedTag')+')':''}`,'small');
+          banner(byNum?`${ICON[ca.t]}${ca.v} ${L.flags.low?'<':'>'} ${ICON[cb.t]}${cb.v}`:`${ICON[ca.t]} ${L.flags.inv?t('beatsWord'):T().verb[ca.t]} ${ICON[cb.t]}${L.flags.inv?' ('+t('reversedTag')+')':''}`,'small');
           const ra=ca.el.getBoundingClientRect(),rb=cb.el.getBoundingClientRect(),dx=Math.sign(rb.left-ra.left)*22;
           A(ca.el,[{transform:'translateX(0) scale(1)'},{transform:`translateX(${dx}px) scale(1.1)`},{transform:'translateX(0) scale(1)'}],{duration:260,easing:'ease-out'});
           setTimeout(()=>shake(cb.el),130);
